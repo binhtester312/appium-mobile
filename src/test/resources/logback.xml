@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    logback.xml — Logging configuration for the framework.
+    
+    Controls where logs go (console, file) and what level to show.
+    Placed in src/test/resources so it's on the test classpath.
+    
+    LOG LEVELS (low → high): TRACE → DEBUG → INFO → WARN → ERROR
+    Setting level=INFO means INFO, WARN, and ERROR are shown.
+-->
+<configuration>
+
+    <!-- Console Appender — prints to terminal -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- Format: [TIME] [LEVEL] [CLASS] - MESSAGE -->
+            <pattern>%d{HH:mm:ss.SSS} [%-5level] [%logger{36}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File Appender — writes logs to a file -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>test-output/logs/appium-test.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Keep 7 days of log files -->
+            <fileNamePattern>test-output/logs/appium-test.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%thread] [%logger{36}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root logger — applies to all classes -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <!-- Reduce noise from Selenium/Appium internal logs -->
+    <logger name="io.appium" level="WARN"/>
+    <logger name="org.openqa.selenium" level="WARN"/>
+    <logger name="io.netty" level="WARN"/>
+
+</configuration>

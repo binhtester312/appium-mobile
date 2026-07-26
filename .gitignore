@@ -1,0 +1,43 @@
+# ============================================================
+#  .gitignore for Appium Android Automation Framework
+# ============================================================
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# --- Maven ---
+target/
+
+# --- Test Output ---
+test-output/
+!test-output/.gitkeep
+
+# --- Screenshots ---
+screenshots/
+*.png
+
+# --- Log Files ---
+*.log
+logs/
+
+# --- macOS ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V8
+.Trashes
+
+# --- System ---
+Thumbs.db
+
+# --- Environment ---
+# Do NOT commit sensitive config — use environment variables or CI secrets
+# config.properties (only if it contains real passwords — for now it's fine)
+
+# --- APK files ---
+*.apk
+*.aab
