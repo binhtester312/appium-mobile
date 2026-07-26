@@ -3,6 +3,8 @@ package driver;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.ConfigReader;
@@ -13,35 +15,26 @@ import java.net.URL;
 import java.time.Duration;
 
 /**
- * DriverFactory — Creates and manages AndroidDriver instances.
+ * DriverFactory — Creates and manages AppiumDriver instances for both Android & iOS.
  *
  * DESIGN PATTERN: ThreadLocal Pattern
- * WHY: Each test thread gets its own AndroidDriver, enabling true
- * parallel test execution without driver conflicts.
- *
- * HOW IT WORKS:
- *   - DriverFactory.initDriver()  → creates driver for current thread
- *   - DriverFactory.getDriver()   → retrieves driver for current thread
- *   - DriverFactory.quitDriver()  → quits and removes driver for current thread
+ * WHY: Enables safe parallel test execution across multiple threads/devices.
  */
 public class DriverFactory {
 
     private static final Logger log = LoggerFactory.getLogger(DriverFactory.class);
 
     /**
-     * ThreadLocal ensures each test thread has its own isolated AndroidDriver.
-     * This is the key to safe parallel test execution.
+     * ThreadLocal holds the active AppiumDriver (AndroidDriver or IOSDriver) for each thread.
      */
-    private static final ThreadLocal<AndroidDriver> driverThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<AppiumDriver> driverThreadLocal = new ThreadLocal<>();
 
-    // Prevent instantiation — this is a static utility class
+    // Prevent instantiation
     private DriverFactory() {}
 
     /**
-     * Initializes a new AndroidDriver for the current thread.
-     * Reads all configuration from config.properties via ConfigReader.
-     *
-     * Called once per test class in @BeforeClass or @BeforeSuite.
+     * Initializes a new AppiumDriver (Android or iOS) for the current thread.
+     * Platform is determined by 'target.platform' in config.properties or System property.
      */
     public static void initDriver() {
         if (driverThreadLocal.get() != null) {
@@ -50,117 +43,139 @@ public class DriverFactory {
         }
 
         ConfigReader config = ConfigReader.getInstance();
+        
+        // System property takes precedence over config.properties (e.g. mvn test -Dtarget.platform=ios)
+        String platform = System.getProperty("target.platform", config.get("target.platform", "android")).toLowerCase();
 
-        // --- Build Appium capabilities using UiAutomator2Options ---
-        // UiAutomator2Options is the type-safe, strongly-typed way to set
-        // capabilities in Appium 2/3 (replaces deprecated DesiredCapabilities)
-        UiAutomator2Options options = new UiAutomator2Options();
-
-        // Device identification
-        options.setDeviceName(config.get("device.name"));
-        options.setUdid(config.get("udid"));
-        options.setPlatformVersion(config.get("platform.version"));
-
-        // Automation engine — must match the installed Appium driver
-        options.setAutomationName(config.get("automation.name"));
-
-        // App configuration — use appPackage + appActivity for installed apps
-        // OR use setApp() for .apk file path
-        String appPath = config.get("app.path", "");
-        if (!appPath.isEmpty()) {
-            File appFile = new File(appPath);
-            options.setApp(appFile.getAbsolutePath());
-            log.info("Using app file (absolute path): {}", appFile.getAbsolutePath());
-        } else {
-            options.setAppPackage(config.get("app.package"));
-            options.setAppActivity(config.get("app.activity"));
-            log.info("Using installed app: {}/{}", config.get("app.package"), config.get("app.activity"));
-        }
-
-        // Set appWaitActivity to avoid timeout issues when SplashActivity transitions quickly to MainActivity.
-        // Using '*' allows Appium to wait for any activity of the package to start.
-        String appWaitActivity = config.get("app.wait.activity", "*");
-        options.setAppWaitActivity(appWaitActivity);
-        log.info("AppWaitActivity set to: {}", appWaitActivity);
-
-        // Don't reset the app state between test sessions
-        // Set to true if you want a fresh app state each run
-        options.setNoReset(true);
-
-        // Auto-grant permissions — avoids popups interrupting tests
-        options.setAutoGrantPermissions(true);
-
-        // Timeouts
-        options.setNewCommandTimeout(Duration.ofSeconds(config.getInt("implicit.wait") * 6L));
+        log.info("🚀 Initializing Appium Driver for Platform: [{}]", platform.toUpperCase());
 
         try {
             URL appiumServerUrl = new URL(config.get("appium.server.url"));
-            log.info("🚀 Starting AndroidDriver...");
-            log.info("   Server: {}", appiumServerUrl);
-            log.info("   Device: {} ({})", config.get("device.name"), config.get("udid"));
+            AppiumDriver driver;
 
-            AndroidDriver driver = new AndroidDriver(appiumServerUrl, options);
+            if ("ios".equals(platform)) {
+                driver = createIOSDriver(appiumServerUrl, config);
+            } else {
+                driver = createAndroidDriver(appiumServerUrl, config);
+            }
 
-            // Set implicit wait — Appium waits up to N seconds for elements
+            // Set implicit wait
             driver.manage().timeouts().implicitlyWait(
                     Duration.ofSeconds(config.getInt("implicit.wait"))
             );
 
             driverThreadLocal.set(driver);
-            log.info("✅ AndroidDriver initialized successfully.");
+            log.info("✅ {} initialized successfully.", driver.getClass().getSimpleName());
 
         } catch (MalformedURLException e) {
             log.error("❌ Invalid Appium server URL: {}", config.get("appium.server.url"));
             throw new RuntimeException("Invalid Appium server URL", e);
         } catch (Exception e) {
-            log.error("❌ Failed to initialize AndroidDriver: {}", e.getMessage());
-            throw new RuntimeException("AndroidDriver initialization failed. " +
-                    "Is Appium server running? Is the emulator started?", e);
+            log.error("❌ Failed to initialize Appium Driver for platform [{}]: {}", platform, e.getMessage());
+            throw new RuntimeException("Appium Driver initialization failed. " +
+                    "Is Appium server running? Is the emulator/simulator started?", e);
         }
     }
 
     /**
-     * Returns the AndroidDriver for the current thread as AppiumDriver.
-     * Using AppiumDriver type avoids compile-time access to removed Selenium 3
-     * interfaces (ContextAware, LocationContext) in AndroidDriver's class hierarchy.
+     * Creates an AndroidDriver with UiAutomator2Options.
+     */
+    private static AndroidDriver createAndroidDriver(URL serverUrl, ConfigReader config) {
+        UiAutomator2Options options = new UiAutomator2Options();
+
+        options.setDeviceName(config.get("android.device.name", config.get("device.name", "Pixel_8_API_35")));
+        options.setUdid(config.get("android.udid", config.get("udid", "emulator-5554")));
+        options.setPlatformVersion(config.get("android.platform.version", config.get("platform.version", "15.0")));
+        options.setAutomationName(config.get("android.automation.name", "UiAutomator2"));
+
+        String appPath = config.get("android.app.path", config.get("app.path", ""));
+        if (!appPath.isEmpty()) {
+            File appFile = new File(appPath);
+            options.setApp(appFile.getAbsolutePath());
+            log.info("Android App File: {}", appFile.getAbsolutePath());
+        } else {
+            options.setAppPackage(config.get("android.app.package"));
+            options.setAppActivity(config.get("android.app.activity"));
+        }
+
+        String appWaitActivity = config.get("android.app.wait.activity", "*");
+        options.setAppWaitActivity(appWaitActivity);
+        options.setNoReset(true);
+        options.setAutoGrantPermissions(true);
+        options.setNewCommandTimeout(Duration.ofSeconds(config.getInt("implicit.wait") * 6L));
+
+        log.info("Starting AndroidDriver on device: {}", options.getDeviceName());
+        return new AndroidDriver(serverUrl, options);
+    }
+
+    /**
+     * Creates an IOSDriver with XCUITestOptions.
+     */
+    private static IOSDriver createIOSDriver(URL serverUrl, ConfigReader config) {
+        XCUITestOptions options = new XCUITestOptions();
+
+        options.setDeviceName(config.get("ios.device.name", "iPhone 16 Pro"));
+        options.setPlatformVersion(config.get("ios.platform.version", "18.0"));
+        options.setAutomationName(config.get("ios.automation.name", "XCUITest"));
+
+        String udid = config.get("ios.udid", "");
+        if (!udid.isEmpty()) {
+            options.setUdid(udid);
+        }
+
+        String appPath = config.get("ios.app.path", "");
+        if (!appPath.isEmpty()) {
+            File appFile = new File(appPath);
+            options.setApp(appFile.getAbsolutePath());
+            log.info("iOS App File: {}", appFile.getAbsolutePath());
+        } else {
+            String bundleId = config.get("ios.bundle.id", "");
+            if (!bundleId.isEmpty()) {
+                options.setBundleId(bundleId);
+            }
+        }
+
+        options.setNoReset(true);
+        options.setNewCommandTimeout(Duration.ofSeconds(config.getInt("implicit.wait") * 6L));
+
+        log.info("Starting IOSDriver on device: {} ({})", options.getDeviceName(), options.getPlatformVersion());
+        return new IOSDriver(serverUrl, options);
+    }
+
+    /**
+     * Returns the AppiumDriver for the current thread.
      *
      * @return AppiumDriver instance for this thread
      */
     public static AppiumDriver getDriver() {
-        AndroidDriver driver = driverThreadLocal.get();
+        AppiumDriver driver = driverThreadLocal.get();
         if (driver == null) {
             throw new IllegalStateException(
-                    "❌ Driver is null! Call DriverFactory.initDriver() in @BeforeClass first."
+                    "❌ Driver is null! Call DriverFactory.initDriver() in @BeforeMethod first."
             );
         }
         return driver;
     }
 
     /**
-     * Quits the AndroidDriver and removes it from ThreadLocal.
-     * IMPORTANT: Always call this in @AfterClass to prevent resource leaks.
+     * Quits the AppiumDriver and removes it from ThreadLocal.
      */
     public static void quitDriver() {
-        AndroidDriver driver = driverThreadLocal.get();
+        AppiumDriver driver = driverThreadLocal.get();
         if (driver != null) {
             try {
                 driver.quit();
-                log.info("✅ AndroidDriver quit successfully.");
+                log.info("✅ AppiumDriver quit successfully.");
             } catch (Exception e) {
                 log.warn("⚠️ Error while quitting driver: {}", e.getMessage());
             } finally {
-                // Always remove from ThreadLocal to prevent memory leaks
                 driverThreadLocal.remove();
             }
-        } else {
-            log.warn("⚠️ quitDriver() called but no driver exists for this thread.");
         }
     }
 
     /**
      * Checks if driver is currently active for this thread.
-     *
-     * @return true if driver is initialized and active
      */
     public static boolean isDriverActive() {
         return driverThreadLocal.get() != null;
