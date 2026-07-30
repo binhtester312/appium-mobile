@@ -1,5 +1,6 @@
 package commons;
 
+import driver.AppiumServerManager;
 import driver.DriverFactory;
 import io.appium.java_client.AppiumDriver;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import java.lang.reflect.Method;
  *   - Manages the test lifecycle: suite start → test start → test result → suite end
  *   - Handles screenshots on failure automatically
  *   - Manages ExtentReports logging
+ *   - Manages Appium Server lifecycle (auto-start/stop if enabled in config)
  *
  * HOW TO USE:
  *   Every test class extends BaseTest:
@@ -31,10 +33,10 @@ import java.lang.reflect.Method;
  *   }
  *
  * LIFECYCLE ORDER:
- *   @BeforeSuite  → runs once before the entire test suite
+ *   @BeforeSuite  → runs once before the entire test suite (starts Appium Server if run_local_server=true)
  *   @BeforeMethod → runs before each @Test method
  *   @AfterMethod  → runs after each @Test method (captures result)
- *   @AfterSuite   → runs once after all tests finish
+ *   @AfterSuite   → runs once after all tests finish (stops Appium Server)
  */
 public class BaseTest {
 
@@ -55,7 +57,8 @@ public class BaseTest {
     // =========================================================
 
     /**
-     * Initializes the ExtentReport at the start of the test suite.
+     * Initializes the Appium Local Server (if run_local_server=true)
+     * and ExtentReport at the start of the test suite.
      * Runs ONCE before any test class begins.
      */
     @BeforeSuite(alwaysRun = true)
@@ -64,6 +67,9 @@ public class BaseTest {
         log.info("  🚀 TEST SUITE STARTING");
         log.info("========================================");
 
+        // Start Appium Local Server programmatically if enabled
+        AppiumServerManager.startServer();
+
         // Initialize the ExtentReport HTML file
         ExtentReportManager.initReport();
 
@@ -71,12 +77,15 @@ public class BaseTest {
     }
 
     /**
-     * Flushes and saves the ExtentReport after all tests complete.
+     * Flushes and saves the ExtentReport and stops Appium Local Server after all tests complete.
      * Runs ONCE after all test classes finish.
      */
     @AfterSuite(alwaysRun = true)
     public void tearDownSuite() {
         ExtentReportManager.flushReport();
+
+        // Stop Appium Local Server if it was started programmatically
+        AppiumServerManager.stopServer();
 
         log.info("========================================");
         log.info("  ✅ TEST SUITE COMPLETE");

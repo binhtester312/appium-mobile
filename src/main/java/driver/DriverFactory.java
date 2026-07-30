@@ -50,7 +50,7 @@ public class DriverFactory {
         log.info("🚀 Initializing Appium Driver for Platform: [{}]", platform.toUpperCase());
 
         try {
-            URL appiumServerUrl = new URL(config.get("appium.server.url"));
+            URL appiumServerUrl = AppiumServerManager.getServerUrl();
             AppiumDriver driver;
 
             if ("ios".equals(platform)) {
@@ -67,9 +67,6 @@ public class DriverFactory {
             driverThreadLocal.set(driver);
             log.info("✅ {} initialized successfully.", driver.getClass().getSimpleName());
 
-        } catch (MalformedURLException e) {
-            log.error("❌ Invalid Appium server URL: {}", config.get("appium.server.url"));
-            throw new RuntimeException("Invalid Appium server URL", e);
         } catch (Exception e) {
             log.error("❌ Failed to initialize Appium Driver for platform [{}]: {}", platform, e.getMessage());
             throw new RuntimeException("Appium Driver initialization failed. " +
