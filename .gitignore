@@ -24,10 +24,9 @@ screenshots/
 *.log
 logs/
 
-# --- macOS ---
-.DS_Store
-.DS_Store?
-._*
+# --- App Binaries ---
+*.app/
+*.app
 .Spotlight-V8
 .Trashes
 
