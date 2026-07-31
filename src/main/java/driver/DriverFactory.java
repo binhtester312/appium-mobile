@@ -132,7 +132,7 @@ public class DriverFactory {
             }
         }
 
-        options.setNoReset(true);
+        options.setNoReset(false);
         options.setNewCommandTimeout(Duration.ofSeconds(config.getInt("implicit.wait") * 6L));
 
         log.info("Starting IOSDriver on device: {} ({})", options.getDeviceName(), options.getPlatformVersion());
