@@ -2,10 +2,10 @@ package pageObjects.ios;
 
 import commons.BasePage;
 import io.appium.java_client.AppiumDriver;
-import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pageUIs.ios.LoginPageUI;
+
 
 /**
  * LoginPage (iOS) — Page Object for iOS Login screen.
@@ -26,7 +26,6 @@ public class LoginPage extends BasePage {
     }
 
     public void enterUsername(String username) {
-        log.info("Entering username on iOS: {}", username);
         sendKeys(LoginPageUI.USERNAME_INPUT, username);
     }
 
@@ -56,11 +55,13 @@ public class LoginPage extends BasePage {
     }
 
     public boolean isLoginPageDisplayed() {
-        sleep(1500);
         try {
-            return !driver.findElements(By.xpath("//XCUIElementTypeTextField | //XCUIElementTypeSecureTextField | //*[@name='Username input field'] | //*[@name='Login button'] | //XCUIElementTypeStaticText[contains(@name, 'Login')]")).isEmpty();
-        } catch (Exception e) {
+            // LOGIN_BUTTON verified: accessibilityId="Login", type=XCUIElementTypeButton
+            waitForVisibility(LoginPageUI.LOGIN_BUTTON);
             return true;
+        } catch (Exception e) {
+            log.warn("Login page not detected: {}", e.getMessage());
+            return false;
         }
     }
 

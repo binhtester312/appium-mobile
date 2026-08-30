@@ -32,6 +32,10 @@ logs/
 
 # --- System ---
 Thumbs.db
+.DS_Store
+.vscode/
+antigravity-testing-kit-main/
+RULE_GLOBAL.md
 
 # --- Environment ---
 # Do NOT commit sensitive config — use environment variables or CI secrets

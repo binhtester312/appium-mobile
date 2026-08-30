@@ -10,21 +10,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 
-/**
- * AppiumServerManager — Manages local Appium Server lifecycle programmatically.
- *
- * HYBRID STRATEGY:
- *  - If 'appium.auto.start.server' (or system property 'run_local_server') is true:
- *    Programmatically starts Appium Server using a free port (or 4723) to avoid port conflicts.
- *  - If false:
- *    Uses static URL from config.properties ('appium.server.url'), ideal for manual debugging or CI/CD Grid.
- */
 public class AppiumServerManager {
 
     private static final Logger log = LoggerFactory.getLogger(AppiumServerManager.class);
     private static AppiumDriverLocalService service;
 
-    private AppiumServerManager() {}
+    private AppiumServerManager() {
+    }
 
     /**
      * Starts the Appium Server programmatically if auto-start is enabled in config.
@@ -36,8 +28,7 @@ public class AppiumServerManager {
         boolean autoStart = Boolean.parseBoolean(
                 System.getProperty("run_local_server",
                         System.getProperty("appium.auto.start.server",
-                                config.get("appium.auto.start.server", "false")))
-        );
+                                config.get("appium.auto.start.server", "false"))));
 
         if (!autoStart) {
             log.info("ℹ️ Appium Local Server Auto-Start is DISABLED (run_local_server=false). " +
@@ -70,7 +61,8 @@ public class AppiumServerManager {
 
     /**
      * Returns the active Appium Server URL.
-     * Uses dynamic service URL if auto-started, otherwise falls back to static config URL.
+     * Uses dynamic service URL if auto-started, otherwise falls back to static
+     * config URL.
      *
      * @return URL instance for Appium Server connection
      */
