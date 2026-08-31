@@ -64,8 +64,8 @@ public class SwipeVertically {
         WebElement robotIconElement = null;
 
         for (int i = 0; i < 5; i++) {
-            if (!appiumDriver.findElements(By.xpath("//*[contains(@text, 'You found me') or contains(@content-desc, 'You found me') or contains(@text, 'found me')]")).isEmpty()) {
-                robotIconElement = appiumDriver.findElement(By.xpath("//*[contains(@text, 'You found me') or contains(@content-desc, 'You found me') or contains(@text, 'found me')]"));
+            if (!appiumDriver.findElements(By.xpath("//*[@text='You found me!']")).isEmpty()) {
+                robotIconElement = appiumDriver.findElement(By.xpath("//*[@text='You found me!']"));
                 isRobotElementFound = true;
                 System.out.println(">>> Robot element found on swipe attempt #" + (i + 1));
                 break;
