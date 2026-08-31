@@ -41,11 +41,11 @@ public class SwipeVertically {
         int screenHeight = windowSize.getHeight();
         int screenWidth = windowSize.getWidth();
 
-        // Init start points and end points to touch and release
+        // Init start points and end points to touch and release (Safe bounds: 70% to 30% to avoid system bars)
         int xStartPoint = 50 * screenWidth / 100;
         int xEndPoint = xStartPoint;
-        int yStartPoint = 90 * screenHeight / 100;
-        int yEndPoint = 10 * screenHeight / 100;
+        int yStartPoint = 70 * screenHeight / 100;
+        int yEndPoint = 30 * screenHeight / 100;
 
         // Perform W3C Touch Actions
 
