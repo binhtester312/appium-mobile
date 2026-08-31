@@ -35,7 +35,6 @@ public class SwipeVertically {
         wait.until(ExpectedConditions.visibilityOfElementLocated(
                 By.xpath("//*[@text='Swipe horizontal' or @content-desc='Swipe-screen' or @text='Swipe']")));
 
-
         // Get the mobile screen sizes
         Dimension windowSize = appiumDriver.manage().window().getSize();
         int screenHeight = windowSize.getHeight();
@@ -49,8 +48,8 @@ public class SwipeVertically {
 
         // Perform W3C Touch Actions (Appium 8/9 standard migration from TouchAction)
 
-        // --- 1. SCROLL UP (Swipe from bottom to top -> Scroll page down) ---
-        System.out.println(">>> Executing SWIPE UP (Scrolling page down)...");
+        // --- 1. SCROLL DOWN PAGE (Swipe from bottom 90% to top 10%) ---
+        System.out.println(">>> 1. Executing SWIPE UP (Scrolling page down to bottom)...");
         PointerInput finger1 = new PointerInput(PointerInput.Kind.TOUCH, "finger1");
         Sequence swipeUp = new Sequence(finger1, 1);
 
@@ -77,8 +76,8 @@ public class SwipeVertically {
             e.printStackTrace();
         }
 
-        // --- 2. SCROLL DOWN (Swipe from top to bottom -> Scroll page up back) ---
-        System.out.println(">>> Executing SWIPE DOWN (Scrolling page back up)...");
+        // --- 2. SCROLL BACK UP PAGE (Swipe from top 10% to bottom 90%) ---
+        System.out.println(">>> 2. Executing SWIPE DOWN (Scrolling page back up to top)...");
         PointerInput finger2 = new PointerInput(PointerInput.Kind.TOUCH, "finger2");
         Sequence swipeDown = new Sequence(finger2, 1);
 
