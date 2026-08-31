@@ -57,62 +57,59 @@ public class SwipeVertically {
         // Cuộn màn hình ngược trở lại về vị trí ban đầu trên đỉnh trang.
         // Nghỉ 3 giây: Để bạn quan sát màn hình đã cuộn lại về đầu trang.
 
-        // --- 1. SCROLL DOWN PAGE (Swipe from bottom 90% to top 10%) ---
-        System.out.println(">>> 1. Executing SWIPE UP (Scrolling page down to bottom)...");
-        PointerInput finger1 = new PointerInput(PointerInput.Kind.TOUCH, "finger1");
-        Sequence swipeUp = new Sequence(finger1, 1);
+        // --- 1. SCROLL DOWN UNTIL "You found me!" IS VISIBLE ---
+        System.out.println(">>> 1. Executing SWIPE UP to scroll down until 'You found me!' is visible...");
 
-        // B1: Đưa ngón tay ở mép dưới screen (90% height)
-        swipeUp.addAction(
-                finger1.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
+        boolean isRobotElementFound = false;
+        WebElement robotIconElement = null;
 
-        // B2: Ấn ngón tay xuống mặt kính
-        swipeUp.addAction(finger1.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        for (int i = 0; i < 5; i++) {
+            if (!appiumDriver.findElements(By.xpath("//*[contains(@text, 'You found me') or contains(@content-desc, 'You found me') or contains(@text, 'found me')]")).isEmpty()) {
+                robotIconElement = appiumDriver.findElement(By.xpath("//*[contains(@text, 'You found me') or contains(@content-desc, 'You found me') or contains(@text, 'found me')]"));
+                isRobotElementFound = true;
+                System.out.println(">>> Robot element found on swipe attempt #" + (i + 1));
+                break;
+            }
 
-        // B3: Di chuyển ngón tay lên phía mép trên (10% height) trong 1s
-        swipeUp.addAction(finger1.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), xEndPoint,
-                yEndPoint));
+            System.out.println(">>> Swiping up (attempt #" + (i + 1) + ")...");
+            PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger_up_" + i);
+            Sequence swipeUp = new Sequence(finger, 1);
 
-        // B4: Nhấc ngón tay lên
-        swipeUp.addAction(finger1.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+            swipeUp.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
+            swipeUp.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+            swipeUp.addAction(finger.createPointerMove(Duration.ofMillis(800), PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
+            swipeUp.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
-        // B5: Gửi chuỗi hành động cho Appium thực thi
-        appiumDriver.perform(Collections.singletonList(swipeUp));
+            appiumDriver.perform(Collections.singletonList(swipeUp));
+        }
 
-        // --- ASSERTION: Kiểm tra đã nhìn thấy icon/text "You found me!" sau khi cuộn xuống ---
-        WebElement robotIconElement = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//*[contains(@text, 'You found me') or contains(@content-desc, 'You found me') or contains(@text, 'found me')]")
-        ));
-        Assert.assertTrue(robotIconElement.isDisplayed(), "Robot icon / 'You found me!' text is not displayed!");
-        System.out.println(">>> ASSERTION PASSED: Found 'You found me!' robot element on screen!");
+        // --- ASSERTION: Verify 'You found me!' robot element is displayed ---
+        Assert.assertTrue(isRobotElementFound, "Robot icon / 'You found me!' text is not displayed!");
+        System.out.println(">>> ASSERTION PASSED: Successfully verified 'You found me!' robot element on screen!");
 
-        // Dừng 3 giây để bạn nhìn rõ màn hình đã cuộn xuống!
+        // Dừng 3 giây để nhìn rõ robot icon trên màn hình
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        // --- 2. SCROLL BACK UP PAGE (Swipe from top 10% to bottom 90%) ---
+        // --- 2. SCROLL BACK UP TO TOP ---
         System.out.println(">>> 2. Executing SWIPE DOWN (Scrolling page back up to top)...");
-        PointerInput finger2 = new PointerInput(PointerInput.Kind.TOUCH, "finger2");
-        Sequence swipeDown = new Sequence(finger2, 1);
+        for (int i = 0; i < 3; i++) {
+            PointerInput fingerBack = new PointerInput(PointerInput.Kind.TOUCH, "finger_down_" + i);
+            Sequence swipeDown = new Sequence(fingerBack, 1);
 
-        swipeDown.addAction(
-                finger2.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
+            swipeDown.addAction(fingerBack.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
+            swipeDown.addAction(fingerBack.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+            swipeDown.addAction(fingerBack.createPointerMove(Duration.ofMillis(800), PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
+            swipeDown.addAction(fingerBack.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
-        swipeDown.addAction(finger2.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+            appiumDriver.perform(Collections.singletonList(swipeDown));
+        }
 
-        swipeDown.addAction(finger2.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(),
-                xStartPoint, yStartPoint));
-
-        swipeDown.addAction(finger2.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-
-        appiumDriver.perform(Collections.singletonList(swipeDown));
-
-        // Dừng 3 giây để nhìn rõ màn hình đã cuộn ngược trở lại!
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
