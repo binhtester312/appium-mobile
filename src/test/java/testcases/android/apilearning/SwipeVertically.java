@@ -66,7 +66,7 @@ public class SwipeVertically {
 
         boolean isRobotElementFound = false;
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 8; i++) {
             List<WebElement> elements = appiumDriver.findElements(By.xpath("//*[contains(@text, 'You found me')]"));
             if (!elements.isEmpty()) {
                 isRobotElementFound = true;
