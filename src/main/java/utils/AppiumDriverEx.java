@@ -29,6 +29,7 @@ public class AppiumDriverEx {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to initialize AppiumDriver: " + e.getMessage(), e);
         }
 
         return appiumDriver;

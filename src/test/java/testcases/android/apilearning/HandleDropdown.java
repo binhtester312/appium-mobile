@@ -1,7 +1,11 @@
 package testcases.android.apilearning;
 
+import java.time.Duration;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.Test;
 
 import io.appium.java_client.AppiumBy;
@@ -20,12 +24,18 @@ public class HandleDropdown {
         WebElement formsLabel = appiumDriver.findElement(AppiumBy.accessibilityId("Forms"));
         formsLabel.click();
 
-        // Click on the dropdown element
-        WebElement dropdownMenuElement = appiumDriver.findElement(AppiumBy.accessibilityId("select-Dropdown"));
+        WebDriverWait wait = new WebDriverWait(appiumDriver, Duration.ofSeconds(15));
+
+        // Click on the dropdown element (handles 'Dropdown', 'select-Dropdown', or 'Select an item...')
+        WebElement dropdownMenuElement = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//*[@content-desc='Dropdown' or @content-desc='select-Dropdown' or contains(@text, 'Select an item')]")
+        ));
         dropdownMenuElement.click();
 
         // Select the first option
-        WebElement firstOption = appiumDriver.findElement(By.xpath("//*[@text='webdriver.io is awesome']"));
+        WebElement firstOption = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//*[@text='webdriver.io is awesome']")
+        ));
         firstOption.click();
 
         try {
@@ -33,10 +43,6 @@ public class HandleDropdown {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        new HandleDropdown().testHandleDropdown();
     }
 }
 
