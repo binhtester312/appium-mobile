@@ -3,6 +3,7 @@ package testcases.android.apilearning;
 import java.time.Duration;
 import java.util.Collections;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.PointerInput;
@@ -25,12 +26,15 @@ public class SwipeVertically {
 
         WebDriverWait wait = new WebDriverWait(appiumDriver, Duration.ofSeconds(30));
 
-        // Click on Forms label
-        WebElement formsLabel = wait.until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("Forms")));
-        formsLabel.click();
+        // Click on Swipe label
+        WebElement swipeLabel = wait
+                .until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("Swipe")));
+        swipeLabel.click();
 
-        // Make sure I'm on the target screen
-        wait.until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("switch-text")));
+        // Make sure I'm on the target screen (Swipe module screen)
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//*[@text='Swipe horizontal' or @content-desc='Swipe-screen' or @text='Swipe']")));
+
 
         // Get the mobile screen sizes
         Dimension windowSize = appiumDriver.manage().window().getSize();
@@ -47,11 +51,26 @@ public class SwipeVertically {
         PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
 
         // Scroll up - Swipe from bottom to top
+
+        // Tạo 1 chuỗi hành động số 1 cho ngón tay
         Sequence swipeUp = new Sequence(finger, 1);
-        swipeUp.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
+
+        // B1: đưa ngón tay ở mép dưới screen
+        swipeUp.addAction(
+                finger.createPointerMove(Duration.ZERO, PointerInput.Origin
+                        .viewport(), xStartPoint, yStartPoint));
+
+        // B2: ấn ngón tay xuống mặt kính
         swipeUp.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-        swipeUp.addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
+
+        // B3: di chuyển ngón tay lên phía mép trên trong 1s
+        swipeUp.addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), xEndPoint,
+                yEndPoint));
+
+        // B4: nhấc ngón tay lên
         swipeUp.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+        // B5: gửi toàn bộ 4 bước trên cho điện thoại thực thi
         appiumDriver.perform(Collections.singletonList(swipeUp));
 
         try {
@@ -62,14 +81,20 @@ public class SwipeVertically {
 
         // Scroll down - Swipe from top to bottom
         Sequence swipeDown = new Sequence(finger, 1);
-        swipeDown.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
+
+        swipeDown.addAction(
+                finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(),
+                        xEndPoint, yEndPoint));
+
         swipeDown.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-        swipeDown.addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
+
+        swipeDown.addAction(finger.createPointerMove(Duration.ofMillis(1000),
+                PointerInput.Origin.viewport(),
+                xStartPoint, yStartPoint));
+
         swipeDown.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
         appiumDriver.perform(Collections.singletonList(swipeDown));
     }
 
-    public static void main(String[] args) {
-        new SwipeVertically().testSwipeVertically();
-    }
 }
