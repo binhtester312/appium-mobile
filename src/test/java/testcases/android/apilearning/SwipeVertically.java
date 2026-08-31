@@ -48,53 +48,56 @@ public class SwipeVertically {
         int yEndPoint = 10 * screenHeight / 100;
 
         // Perform W3C Touch Actions (Appium 8/9 standard migration from TouchAction)
-        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
 
-        // Scroll up - Swipe from bottom to top
+        // --- 1. SCROLL UP (Swipe from bottom to top -> Scroll page down) ---
+        System.out.println(">>> Executing SWIPE UP (Scrolling page down)...");
+        PointerInput finger1 = new PointerInput(PointerInput.Kind.TOUCH, "finger1");
+        Sequence swipeUp = new Sequence(finger1, 1);
 
-        // Tạo 1 chuỗi hành động số 1 cho ngón tay
-        Sequence swipeUp = new Sequence(finger, 1);
-
-        // B1: đưa ngón tay ở mép dưới screen
+        // B1: Đưa ngón tay ở mép dưới screen (90% height)
         swipeUp.addAction(
-                finger.createPointerMove(Duration.ZERO, PointerInput.Origin
-                        .viewport(), xStartPoint, yStartPoint));
+                finger1.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
 
-        // B2: ấn ngón tay xuống mặt kính
-        swipeUp.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        // B2: Ấn ngón tay xuống mặt kính
+        swipeUp.addAction(finger1.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
 
-        // B3: di chuyển ngón tay lên phía mép trên trong 1s
-        swipeUp.addAction(finger.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), xEndPoint,
-                yEndPoint));
+        // B3: Di chuyển ngón tay lên phía mép trên (10% height) trong 1s
+        swipeUp.addAction(finger1.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
 
-        // B4: nhấc ngón tay lên
-        swipeUp.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        // B4: Nhấc ngón tay lên
+        swipeUp.addAction(finger1.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
-        // B5: gửi toàn bộ 4 bước trên cho điện thoại thực thi
+        // B5: Gửi chuỗi hành động cho Appium thực thi
         appiumDriver.perform(Collections.singletonList(swipeUp));
 
+        // Dừng 3 giây để bạn nhìn rõ màn hình đã cuộn xuống!
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        // Scroll down - Swipe from top to bottom
-        Sequence swipeDown = new Sequence(finger, 1);
+        // --- 2. SCROLL DOWN (Swipe from top to bottom -> Scroll page up back) ---
+        System.out.println(">>> Executing SWIPE DOWN (Scrolling page back up)...");
+        PointerInput finger2 = new PointerInput(PointerInput.Kind.TOUCH, "finger2");
+        Sequence swipeDown = new Sequence(finger2, 1);
 
         swipeDown.addAction(
-                finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(),
-                        xEndPoint, yEndPoint));
+                finger2.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
 
-        swipeDown.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        swipeDown.addAction(finger2.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
 
-        swipeDown.addAction(finger.createPointerMove(Duration.ofMillis(1000),
-                PointerInput.Origin.viewport(),
-                xStartPoint, yStartPoint));
+        swipeDown.addAction(finger2.createPointerMove(Duration.ofMillis(1000), PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
 
-        swipeDown.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+        swipeDown.addAction(finger2.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
         appiumDriver.perform(Collections.singletonList(swipeDown));
-    }
 
+        // Dừng 3 giây để nhìn rõ màn hình đã cuộn ngược trở lại!
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
