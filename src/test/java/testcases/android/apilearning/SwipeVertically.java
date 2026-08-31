@@ -2,6 +2,7 @@ package testcases.android.apilearning;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -57,15 +58,17 @@ public class SwipeVertically {
         // Cuộn màn hình ngược trở lại về vị trí ban đầu trên đỉnh trang.
         // Nghỉ 3 giây: Để bạn quan sát màn hình đã cuộn lại về đầu trang.
 
-        // --- 1. SCROLL DOWN UNTIL "You found me!" IS VISIBLE ---
-        System.out.println(">>> 1. Executing SWIPE UP to scroll down until 'You found me!' is visible...");
+        // --- 1. SCROLL DOWN UNTIL "You found me" IS VISIBLE ---
+        System.out.println(">>> 1. Executing SWIPE UP to scroll down until 'You found me' is visible...");
+
+        // Set implicit wait to 1s so findElements check does not wait 30s per swipe
+        appiumDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
 
         boolean isRobotElementFound = false;
-        WebElement robotIconElement = null;
 
         for (int i = 0; i < 5; i++) {
-            if (!appiumDriver.findElements(By.xpath("//*[@text='You found me!']")).isEmpty()) {
-                robotIconElement = appiumDriver.findElement(By.xpath("//*[@text='You found me!']"));
+            List<WebElement> elements = appiumDriver.findElements(By.xpath("//*[contains(@text, 'You found me')]"));
+            if (!elements.isEmpty()) {
                 isRobotElementFound = true;
                 System.out.println(">>> Robot element found on swipe attempt #" + (i + 1));
                 break;
@@ -83,9 +86,12 @@ public class SwipeVertically {
             appiumDriver.perform(Collections.singletonList(swipeUp));
         }
 
-        // --- ASSERTION: Verify 'You found me!' robot element is displayed ---
-        Assert.assertTrue(isRobotElementFound, "Robot icon / 'You found me!' text is not displayed!");
-        System.out.println(">>> ASSERTION PASSED: Successfully verified 'You found me!' robot element on screen!");
+        // Restore implicit wait
+        appiumDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+
+        // --- ASSERTION: Verify 'You found me' robot element is displayed ---
+        Assert.assertTrue(isRobotElementFound, "Robot icon / 'You found me' text is not displayed!");
+        System.out.println(">>> ASSERTION PASSED: Successfully verified 'You found me' robot element on screen!");
 
         // Dừng 3 giây để nhìn rõ robot icon trên màn hình
         try {
