@@ -41,11 +41,11 @@ public class SwipeVertically {
         int screenHeight = windowSize.getHeight();
         int screenWidth = windowSize.getWidth();
 
-        // Init start points and end points to touch and release (Safe bounds: 70% to 30% to avoid system bars)
-        int xStartPoint = 50 * screenWidth / 100;
+        // Init start points and end points (Safe bounds: X = 85% to bypass horizontal carousel, Y = 80% to 20%)
+        int xStartPoint = 85 * screenWidth / 100;
         int xEndPoint = xStartPoint;
-        int yStartPoint = 70 * screenHeight / 100;
-        int yEndPoint = 30 * screenHeight / 100;
+        int yStartPoint = 80 * screenHeight / 100;
+        int yEndPoint = 20 * screenHeight / 100;
 
         // Perform W3C Touch Actions
 
@@ -53,11 +53,7 @@ public class SwipeVertically {
         // Thao tác 1 (swipeUp) - Vuốt từ dưới (90%) lên trên (10%):
         // Cuộn màn hình xuống dưới để xem các nội dung bên dưới (như icon con robot
         // "You found me!").
-        // Nghỉ 3 giây: Để bạn quan sát rõ màn hình đã cuộn xuống.
-        // Thao tác 2 (swipeDown) - Vuốt từ trên (10%) xuống dưới (90%):
-        // Cuộn màn hình ngược trở lại về vị trí ban đầu trên đỉnh trang.
-        // Nghỉ 3 giây: Để bạn quan sát màn hình đã cuộn lại về đầu trang.
-
+        
         // --- 1. SCROLL DOWN UNTIL "You found me" IS VISIBLE ---
         System.out.println(">>> 1. Executing SWIPE UP to scroll down until 'You found me' is visible...");
 
@@ -66,7 +62,7 @@ public class SwipeVertically {
 
         boolean isRobotElementFound = false;
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 5; i++) {
             List<WebElement> elements = appiumDriver.findElements(By.xpath("//*[contains(@text, 'You found me')]"));
             if (!elements.isEmpty()) {
                 isRobotElementFound = true;
@@ -80,7 +76,7 @@ public class SwipeVertically {
 
             swipeUp.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
             swipeUp.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-            swipeUp.addAction(finger.createPointerMove(Duration.ofMillis(800), PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
+            swipeUp.addAction(finger.createPointerMove(Duration.ofMillis(350), PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
             swipeUp.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
             appiumDriver.perform(Collections.singletonList(swipeUp));
@@ -108,7 +104,7 @@ public class SwipeVertically {
 
             swipeDown.addAction(fingerBack.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), xEndPoint, yEndPoint));
             swipeDown.addAction(fingerBack.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-            swipeDown.addAction(fingerBack.createPointerMove(Duration.ofMillis(800), PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
+            swipeDown.addAction(fingerBack.createPointerMove(Duration.ofMillis(350), PointerInput.Origin.viewport(), xStartPoint, yStartPoint));
             swipeDown.addAction(fingerBack.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
             appiumDriver.perform(Collections.singletonList(swipeDown));
