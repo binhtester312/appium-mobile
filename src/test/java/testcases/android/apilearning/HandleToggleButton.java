@@ -1,13 +1,16 @@
 package testcases.android.apilearning;
 
 import org.openqa.selenium.WebElement;
+import org.testng.annotations.Test;
+
 import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import utils.AppiumDriverEx;
 
 public class HandleToggleButton {
 
-    public static void main(String[] args) {
+    @Test
+    public void testHandleToggleButton() {
 
         // Launch an appium session
         AppiumDriver appiumDriver = AppiumDriverEx.getAppiumDriver();
@@ -28,4 +31,9 @@ public class HandleToggleButton {
         WebElement switchTextElementAfter = appiumDriver.findElement(AppiumBy.accessibilityId("switch-text"));
         System.out.println("Label Text AFTER interacting with Toggle button: " + switchTextElementAfter.getText());
     }
+
+    public static void main(String[] args) {
+        new HandleToggleButton().testHandleToggleButton();
+    }
 }
+
