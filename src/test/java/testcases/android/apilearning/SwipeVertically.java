@@ -4,28 +4,24 @@ import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.interactions.Pause;
-import org.openqa.selenium.interactions.PointerInput;
-import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.AppiumDriverEx;
+import utils.SwipeHelper;
 
 import java.time.Duration;
-import java.util.Collections;
 
 public class SwipeVertically {
 
     public static void main(String[] args) {
-        // 1. Create a session (Không còn dùng MobileElement generic type)
+        // 1. Create a session
         AppiumDriver appiumDriver = AppiumDriverEx.getAppiumDriver();
 
         try {
-            // 2. Click on Forms label (Dùng AppiumBy.accessibilityId thay vì
-            // findElementByAccessibilityId)
+            // 2. Click on Swipe tab
             appiumDriver.findElement(AppiumBy.accessibilityId("Swipe")).click();
 
-            // 3. Make sure on the target screen (WebDriverWait dùng Duration thay vì long)
+            // 3. Make sure on the target screen
             WebDriverWait wait = new WebDriverWait(appiumDriver, Duration.ofSeconds(30));
             wait.until(ExpectedConditions.visibilityOfElementLocated(
                     AppiumBy.xpath("//android.widget.TextView[@text='Swipe horizontal']")));
@@ -35,23 +31,18 @@ public class SwipeVertically {
             int screenHeight = windowSize.getHeight();
             int screenWidth = windowSize.getWidth();
 
-            // 5. Init start points and end points
-            int xStartPoint = 50 * screenWidth / 100;
-            int xEndPoint = xStartPoint;
-            int yStartPoint = 90 * screenHeight / 100;
-            int yEndPoint = 10 * screenHeight / 100;
+            // 5. Init start points and end points (tính theo % màn hình)
+            Point startPoint = new Point(screenWidth / 2, 90 * screenHeight / 100);
+            Point endPoint   = new Point(screenWidth / 2, 10 * screenHeight / 100);
 
-            Point startPoint = new Point(xStartPoint, yStartPoint);
-            Point endPoint = new Point(xEndPoint, yEndPoint);
-
-            // 6. Scroll up - Swipe from bottom to top (yStartPoint -> yEndPoint)
-            swipe(appiumDriver, startPoint, endPoint, Duration.ofMillis(1000));
+            // 6. Scroll up — Swipe từ dưới lên trên
+            SwipeHelper.swipe(appiumDriver, startPoint, endPoint, Duration.ofMillis(1000));
 
             // Dừng ngắn giữa 2 lần vuốt để UI ổn định
             Thread.sleep(1000);
 
-            // 7. Scroll down - Swipe from top to bottom (yEndPoint -> yStartPoint)
-            swipe(appiumDriver, endPoint, startPoint, Duration.ofMillis(1000));
+            // 7. Scroll down — Swipe từ trên xuống dưới
+            SwipeHelper.swipe(appiumDriver, endPoint, startPoint, Duration.ofMillis(1000));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,27 +51,5 @@ public class SwipeVertically {
                 appiumDriver.quit();
             }
         }
-    }
-
-    /**
-     * Hàm dùng W3C Actions thay thế cho TouchAction đã bị xóa
-     */
-    public static void swipe(AppiumDriver driver, Point start, Point end, Duration duration) {
-        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
-        Sequence swipe = new Sequence(finger, 1);
-
-        // Di chuyển ngón tay đến toạ độ bắt đầu
-        swipe.addAction(
-                finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), start.getX(), start.getY()));
-        // Chạm ngón tay xuống màn hình (press)
-        swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-        // Giữ nhẹ trước khi kéo (tương tự waitAction)
-        swipe.addAction(new Pause(finger, Duration.ofMillis(200)));
-        // Vuốt đến toạ độ kết thúc
-        swipe.addAction(finger.createPointerMove(duration, PointerInput.Origin.viewport(), end.getX(), end.getY()));
-        // Nhấc ngón tay lên (release)
-        swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-
-        driver.perform(Collections.singletonList(swipe));
     }
 }

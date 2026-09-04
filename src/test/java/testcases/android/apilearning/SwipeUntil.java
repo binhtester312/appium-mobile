@@ -4,15 +4,12 @@ import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.interactions.Pause;
-import org.openqa.selenium.interactions.PointerInput;
-import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.AppiumDriverEx;
+import utils.SwipeHelper;
 
 import java.time.Duration;
-import java.util.Collections;
 
 public class SwipeUntil {
 
@@ -21,7 +18,7 @@ public class SwipeUntil {
         AppiumDriver appiumDriver = AppiumDriverEx.getAppiumDriver();
 
         try {
-            // 2. Click on Swipe label
+            // 2. Click on Swipe tab
             appiumDriver.findElement(AppiumBy.accessibilityId("Swipe")).click();
 
             // 3. Make sure on the target screen
@@ -35,20 +32,16 @@ public class SwipeUntil {
             int screenWidth = windowSize.getWidth();
 
             // 5. Init start points and end points for Horizontal Swipe
-            // Trục Y nằm ở giữa card (khoảng 65% chiều cao màn hình)
-            int yStartPoint = (int) (screenHeight * 0.65);
-            int yEndPoint = yStartPoint;
+            // Trục Y nằm ở khu vực carousel thẻ (khoảng 65% chiều cao màn hình)
+            int yMid = (int) (screenHeight * 0.65);
 
             // Vuốt từ phải qua trái (xStart: 80% -> xEnd: 10%)
-            int xStartPoint = (int) (screenWidth * 0.80);
-            int xEndPoint = (int) (screenWidth * 0.10);
+            Point startPoint = new Point((int) (screenWidth * 0.80), yMid);
+            Point endPoint   = new Point((int) (screenWidth * 0.10), yMid);
 
-            Point startPoint = new Point(xStartPoint, yStartPoint);
-            Point endPoint = new Point(xEndPoint, yEndPoint);
-
-            // 6. Conditional Swiping: Swipe from right to left until target card is displayed
+            // 6. Conditional Swiping: Swipe từ phải sang trái cho đến khi thấy target card
             int swipeTime = 0;
-            int maxSwipeTimes = 6;
+            int maxSwipeTimes = 10;
             boolean notSeeingTheTargetCard = true;
 
             // Giảm implicit wait về 0s để check element trả về kết quả ngay lập tức
@@ -58,8 +51,9 @@ public class SwipeUntil {
 
             while (notSeeingTheTargetCard && swipeTime < maxSwipeTimes) {
                 try {
-                    boolean isTargetCardDisplayed = !appiumDriver.findElements(
-                            AppiumBy.xpath("//*[@text='EXTENDABLE' or contains(@text, 'EXTENDABLE')]")).isEmpty();
+                    boolean isTargetCardDisplayed = !appiumDriver
+                            .findElements(AppiumBy.xpath("//android.widget.TextView[contains(@text, 'EXTENDABLE')]"))
+                            .isEmpty();
 
                     if (isTargetCardDisplayed) {
                         notSeeingTheTargetCard = false;
@@ -67,12 +61,12 @@ public class SwipeUntil {
                         break;
                     }
                 } catch (Exception e) {
-                    // Ignore exception if element not found yet
+                    // Bỏ qua ngoại lệ nếu element chưa xuất hiện trên màn hình
                 }
 
                 // Vuốt từ phải sang trái (Right -> Left)
                 System.out.println("   [Swipe] Lần " + (swipeTime + 1) + "...");
-                swipe(appiumDriver, startPoint, endPoint, Duration.ofMillis(300));
+                SwipeHelper.swipe(appiumDriver, startPoint, endPoint, Duration.ofMillis(300));
                 swipeTime++;
                 Thread.sleep(800);
             }
@@ -91,27 +85,5 @@ public class SwipeUntil {
                 appiumDriver.quit();
             }
         }
-    }
-
-    /**
-     * Hàm dùng W3C Actions thay thế cho TouchAction đã bị xóa
-     */
-    public static void swipe(AppiumDriver driver, Point start, Point end, Duration duration) {
-        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
-        Sequence swipe = new Sequence(finger, 1);
-
-        // Di chuyển ngón tay đến toạ độ bắt đầu
-        swipe.addAction(
-                finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), start.getX(), start.getY()));
-        // Chạm ngón tay xuống màn hình (press)
-        swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-        // Giữ nhẹ trước khi kéo
-        swipe.addAction(new Pause(finger, Duration.ofMillis(200)));
-        // Vuốt đến toạ độ kết thúc
-        swipe.addAction(finger.createPointerMove(duration, PointerInput.Origin.viewport(), end.getX(), end.getY()));
-        // Nhấc ngón tay lên (release)
-        swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
-
-        driver.perform(Collections.singletonList(swipe));
     }
 }
