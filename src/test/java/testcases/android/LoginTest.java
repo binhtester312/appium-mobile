@@ -1,21 +1,22 @@
 package testcases.android;
 
 import commons.BaseTest;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import io.qameta.allure.Story;
+import io.qameta.allure.Description;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.android.wdio.LoginPage;
-import reports.ExtentReportManager;
 import utils.DataGenerator;
 
 /**
- * LoginTest — Test suite for WDIO Demo App Login functionality.
- *
- * EXTENDS BaseTest → automatically gets:
- *   - Driver setup/teardown (@BeforeMethod / @AfterMethod)
- *   - Screenshot on failure
- *   - ExtentReport logging
- *   - TestNG reporting
+ * LoginTest — Test suite for WDIO Demo App Login functionality with Allure reporting.
  */
+@Epic("Authentication")
+@Feature("Login Feature")
 public class LoginTest extends BaseTest {
 
     // =========================================================
@@ -29,6 +30,9 @@ public class LoginTest extends BaseTest {
         description = "TC_LOGIN_001: Verify user can login with valid credentials",
         groups = {"smoke", "regression"}
     )
+    @Story("Valid Login Flow")
+    @Severity(SeverityLevel.BLOCKER)
+    @Description("Verify that a registered user can successfully log in with valid dynamic credentials and see Success dialog.")
     public void verifyValidLogin() {
         LoginPage loginPage = new LoginPage(getDriver());
         String email = DataGenerator.generateEmail("valid_login");
@@ -38,12 +42,8 @@ public class LoginTest extends BaseTest {
         loginPage.navigateToLoginScreen()
                 .login(email, password);
 
-        ExtentReportManager.logInfo("Submitted login credentials.");
-
         // Assert success alert
         String alertTitle = loginPage.getAlertTitle();
-        ExtentReportManager.logInfo("Alert title found: " + alertTitle);
-
         Assert.assertEquals(alertTitle, "Success", "Alert title should be 'Success' after valid login.");
         loginPage.clickAlertOkButton();
     }
@@ -59,14 +59,14 @@ public class LoginTest extends BaseTest {
         description = "TC_LOGIN_002: Verify Login screen displays input fields and button",
         groups = {"regression"}
     )
+    @Story("Login UI Verification")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that the Login screen correctly renders email/password input fields and the Login CTA button.")
     public void verifyLoginPageIsDisplayed() {
         LoginPage loginPage = new LoginPage(getDriver());
         loginPage.navigateToLoginScreen();
-        ExtentReportManager.logInfo("Navigated to Login screen.");
 
         boolean isDisplayed = loginPage.isLoginScreenDisplayed();
-        ExtentReportManager.logInfo("Login page displayed: " + isDisplayed);
-
         Assert.assertTrue(isDisplayed, "Login page should display email input and login button.");
     }
 }

@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
-import reports.ExtentReportManager;
 
 /**
  * TestListener — TestNG listener that hooks into the test lifecycle.

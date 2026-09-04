@@ -2,19 +2,28 @@ package testcases.android.apilearning;
 
 import commons.BaseTest;
 import io.appium.java_client.AppiumDriver;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.android.wdio.FormsPage;
-import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 
 /**
- * HandleDropdown — Refactored to Page Object Model (POM) with Fluent Method Chaining.
+ * HandleDropdown — Refactored to Page Object Model (POM) with Fluent Method Chaining and Allure.
  * TC: Verify selecting an option from dropdown in Forms screen.
  */
+@Epic("API Learning")
+@Feature("Dropdown Selection")
 public class HandleDropdown extends BaseTest {
 
-    @Test(description = "Verify selecting option from dropdown in Forms screen using method chaining")
+    @Test(
+        description = "Verify selecting option from dropdown in Forms screen using method chaining",
+        groups = {"regression"}
+    )
+    @Severity(SeverityLevel.NORMAL)
     public void testHandleDropdown() {
         String targetOption = "webdriver.io is awesome";
 
@@ -24,10 +33,7 @@ public class HandleDropdown extends BaseTest {
                 .selectDropdownOption(targetOption)
                 .isFormsScreenDisplayed();
 
-        ExtentReportManager.logInfo("Selected dropdown option: " + targetOption);
-
         Assert.assertTrue(isDisplayed, "Forms screen should still be displayed after dropdown selection.");
-        ExtentReportManager.logPass("Verified dropdown option selected successfully with Method Chaining.");
     }
 
     public static void main(String[] args) {

@@ -23,7 +23,9 @@
         <!-- selenium version managed transitively by appium java-client -->
         <testng.version>7.10.2</testng.version>
         <webdrivermanager.version>5.9.2</webdrivermanager.version>
-        <extentreports.version>5.1.2</extentreports.version>
+        <allure.version>2.29.0</allure.version>
+        <aspectj.version>1.9.22.1</aspectj.version>
+        <allure.maven.version>2.15.2</allure.maven.version>
         <slf4j.version>2.0.16</slf4j.version>
         <logback.version>1.5.12</logback.version>
         <jackson.version>2.18.2</jackson.version>
@@ -101,14 +103,25 @@
         </dependency>
 
         <!-- ==========================================
-             EXTENT REPORTS
-             Rich HTML test reports with charts,
-             screenshots, and step-by-step logs
+             ALLURE REPORT
+             Next-generation interactive test reporting
+             with steps, attachments, and timeline
         =========================================== -->
         <dependency>
-            <groupId>com.aventstack</groupId>
-            <artifactId>extentreports</artifactId>
-            <version>${extentreports.version}</version>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-testng</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+
+        <!-- ==========================================
+             ASPECTJ WEAVER
+             Enables @Step and Allure attachments via
+             bytecode instrumentation
+        =========================================== -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
         </dependency>
 
         <!-- ==========================================
@@ -176,12 +189,15 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Surefire Plugin — runs TestNG tests -->
+            <!-- Maven Surefire Plugin — runs TestNG tests with Allure & AspectJ Weaver -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                    </argLine>
                     <!-- Point to your testng.xml suite file (supports -DsuiteXmlFile=...) -->
                     <suiteXmlFiles>
                         <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
@@ -192,7 +208,19 @@
                         <platform>${platform}</platform>
                         <deviceName>${deviceName}</deviceName>
                         <udid>${udid}</udid>
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
                     </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <!-- Allure Maven Plugin — Generates and serves Allure reports -->
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>${allure.maven.version}</version>
+                <configuration>
+                    <reportVersion>${allure.version}</reportVersion>
+                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
                 </configuration>
             </plugin>
         </plugins>

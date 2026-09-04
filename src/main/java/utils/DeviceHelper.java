@@ -104,6 +104,9 @@ public class DeviceHelper {
                 fos.write(decodedVideo);
             }
 
+            // Automatically attach video to Allure Report
+            reports.AllureManager.saveVideo(filePrefix, decodedVideo);
+
             log.info("Video saved successfully at: {}", videoFile.getAbsolutePath());
             return videoFile.getAbsolutePath();
         } catch (Exception e) {

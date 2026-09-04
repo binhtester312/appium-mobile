@@ -3,10 +3,13 @@ package testcases.android.apilearning;
 import commons.BaseTest;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.android.wdio.LoginPage;
-import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 import utils.DataGenerator;
 import utils.DeviceHelper;
@@ -14,12 +17,18 @@ import utils.DeviceHelper;
 import java.time.Duration;
 
 /**
- * PutAppInBackground — Refactored to Page Object Model (POM) with Dynamic Data.
+ * PutAppInBackground — Refactored to Page Object Model (POM) with Dynamic Data and Allure.
  * TC: Put app into background, modify Wi-Fi settings, return to app and dismiss dialog.
  */
+@Epic("API Learning")
+@Feature("Device App Lifecycle & Settings")
 public class PutAppInBackground extends BaseTest {
 
-    @Test(description = "Verify putting app in background, interacting with device settings, and resuming app")
+    @Test(
+        description = "Verify putting app in background, interacting with device settings, and resuming app",
+        groups = {"regression"}
+    )
+    @Severity(SeverityLevel.CRITICAL)
     public void testPutAppInBackground() {
         AndroidDriver androidDriver = (AndroidDriver) getDriver();
 
@@ -30,30 +39,22 @@ public class PutAppInBackground extends BaseTest {
 
         loginPage.navigateToLoginScreen()
                 .login(dynamicEmail, dynamicPassword);
-        ExtentReportManager.logInfo("Submitted login credentials for: " + dynamicEmail);
 
         // 2. Put app in background indefinitely
         DeviceHelper.putAppInBackground(androidDriver, Duration.ofSeconds(-1));
-        ExtentReportManager.logInfo("App sent to background.");
 
         // 3. Open Wi-Fi settings and toggle
         DeviceHelper.openWifiSettings(androidDriver);
-        ExtentReportManager.logInfo("Opened Wi-Fi settings.");
-
         DeviceHelper.toggleWifi(androidDriver, false);
         DeviceHelper.toggleWifi(androidDriver, true);
-        ExtentReportManager.logInfo("Toggled Wi-Fi state.");
 
         // 4. Reactivate WDIO Demo App
         DeviceHelper.activateApp(androidDriver, "com.wdiodemoapp");
-        ExtentReportManager.logInfo("Re-activated WDIO app.");
 
         // 5. Dismiss alert dialog by clicking OK
         loginPage.clickAlertOkButton();
-        ExtentReportManager.logInfo("Dismissed success alert dialog by clicking OK.");
 
         Assert.assertTrue(loginPage.isLoginScreenDisplayed(), "Login screen should be visible after alert is dismissed.");
-        ExtentReportManager.logPass("Verified backgrounding, device settings interaction, and resume flow.");
     }
 
     public static void main(String[] args) {

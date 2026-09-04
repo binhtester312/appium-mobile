@@ -3,10 +3,13 @@ package testcases.android.apilearning;
 import commons.BaseTest;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.android.wdio.LoginPage;
-import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 import utils.DataGenerator;
 import utils.DeviceHelper;
@@ -14,18 +17,23 @@ import utils.DeviceHelper;
 import java.io.File;
 
 /**
- * RecordVideo — Refactored to Page Object Model (POM) with Dynamic Data.
- * TC: Record screen video while executing Login test flow and save to /videos.
+ * RecordVideo — Refactored to Page Object Model (POM) with Dynamic Data and Allure Video Attachment.
+ * TC: Record screen video while executing Login test flow and attach to Allure.
  */
+@Epic("API Learning")
+@Feature("Screen Recording")
 public class RecordVideo extends BaseTest {
 
-    @Test(description = "Verify screen recording during test execution")
+    @Test(
+        description = "Verify screen recording during test execution",
+        groups = {"regression"}
+    )
+    @Severity(SeverityLevel.NORMAL)
     public void testRecordVideo() {
         AndroidDriver androidDriver = (AndroidDriver) getDriver();
 
         // 1. Start video recording
         DeviceHelper.startRecording(androidDriver);
-        ExtentReportManager.logInfo("Started screen recording.");
 
         String videoPath = null;
         try {
@@ -37,19 +45,16 @@ public class RecordVideo extends BaseTest {
             loginPage.navigateToLoginScreen()
                     .login(dynamicEmail, dynamicPassword);
 
-            ExtentReportManager.logInfo("Submitted login credentials for: " + dynamicEmail);
             Assert.assertTrue(loginPage.isAlertDisplayed(), "Success/Alert dialog should be displayed.");
             loginPage.clickAlertOkButton();
 
         } finally {
-            // 3. Stop recording and save video
+            // 3. Stop recording, save video to disk, and automatically attach to Allure Report
             videoPath = DeviceHelper.stopRecordingAndSave(androidDriver, "testRecordVideo");
-            ExtentReportManager.logInfo("Saved test video to: " + videoPath);
         }
 
         Assert.assertNotNull(videoPath, "Video path should not be null.");
         Assert.assertTrue(new File(videoPath).exists(), "Video file should exist on disk.");
-        ExtentReportManager.logPass("Verified screen recording completed and saved successfully.");
     }
 
     public static void main(String[] args) {

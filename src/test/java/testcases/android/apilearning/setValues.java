@@ -2,10 +2,13 @@ package testcases.android.apilearning;
 
 import commons.BaseTest;
 import io.appium.java_client.AppiumDriver;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.android.wdio.LoginPage;
-import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 import utils.DataGenerator;
 
@@ -13,9 +16,15 @@ import utils.DataGenerator;
  * setValues — Refactored to Page Object Model (POM) with Fluent Method Chaining & Dynamic Test Data.
  * TC: Input dynamic email and password, then submit login form.
  */
+@Epic("API Learning")
+@Feature("Form Submission & Values")
 public class setValues extends BaseTest {
 
-    @Test(description = "Verify entering email and password and submitting login form using method chaining")
+    @Test(
+        description = "Verify entering email and password and submitting login form using method chaining",
+        groups = {"regression"}
+    )
+    @Severity(SeverityLevel.CRITICAL)
     public void testSetValues() {
         LoginPage loginPage = new LoginPage(getDriver());
 
@@ -30,12 +39,8 @@ public class setValues extends BaseTest {
                 .tapLoginButton()
                 .isAlertDisplayed();
 
-        ExtentReportManager.logInfo("Generated dynamic email: " + dynamicEmail);
-        ExtentReportManager.logInfo("Alert dialog displayed state: " + isAlertShown);
-
         Assert.assertTrue(isAlertShown, "Success/Alert dialog should appear after login submission.");
         loginPage.clickAlertOkButton();
-        ExtentReportManager.logPass("Verified login form submitted successfully using Dynamic Data & Method Chaining.");
     }
 
     public static void main(String[] args) {

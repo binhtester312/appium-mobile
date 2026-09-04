@@ -10,32 +10,17 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
-import reports.ExtentReportManager;
-import utilities.ConfigReader;
+import reports.AllureManager;
 
 import java.lang.reflect.Method;
 
 /**
- * BaseTest — Parent class for ALL test classes.
- *
- * WHY A BASE TEST CLASS:
- *   - Centralizes driver setup/teardown — you don't repeat @BeforeSuite in every test
- *   - Manages the test lifecycle: suite start → test start → test result → suite end
- *   - Handles screenshots on failure automatically
- *   - Manages ExtentReports logging
- *   - Manages Appium Server lifecycle (auto-start/stop if enabled in config)
- *
- * HOW TO USE:
- *   Every test class extends BaseTest:
- *   public class LoginTest extends BaseTest {
- *       @Test
- *       public void verifyLogin() { ... }
- *   }
+ * BaseTest — Parent class for ALL test classes using Allure Report.
  *
  * LIFECYCLE ORDER:
  *   @BeforeSuite  → runs once before the entire test suite (starts Appium Server if run_local_server=true)
- *   @BeforeMethod → runs before each @Test method
- *   @AfterMethod  → runs after each @Test method (captures result)
+ *   @BeforeMethod → runs before each @Test method (initializes AndroidDriver per thread)
+ *   @AfterMethod  → runs after each @Test method (captures screenshot to Allure on failure, quits driver)
  *   @AfterSuite   → runs once after all tests finish (stops Appium Server)
  */
 public class BaseTest {
@@ -58,38 +43,29 @@ public class BaseTest {
 
     /**
      * Initializes the Appium Local Server (if run_local_server=true)
-     * and ExtentReport at the start of the test suite.
-     * Runs ONCE before any test class begins.
+     * at the start of the test suite.
      */
     @BeforeSuite(alwaysRun = true)
     public void setUpSuite() {
         log.info("========================================");
-        log.info("  🚀 TEST SUITE STARTING");
+        log.info("  🚀 TEST SUITE STARTING (ALLURE ENABLED)");
         log.info("========================================");
 
         // Start Appium Local Server programmatically if enabled
         AppiumServerManager.startServer();
-
-        // Initialize the ExtentReport HTML file
-        ExtentReportManager.initReport();
-
-        log.info("ExtentReport initialized.");
     }
 
     /**
-     * Flushes and saves the ExtentReport and stops Appium Local Server after all tests complete.
-     * Runs ONCE after all test classes finish.
+     * Stops Appium Local Server after all tests complete.
      */
     @AfterSuite(alwaysRun = true)
     public void tearDownSuite() {
-        ExtentReportManager.flushReport();
-
         // Stop Appium Local Server if it was started programmatically
         AppiumServerManager.stopServer();
 
         log.info("========================================");
         log.info("  ✅ TEST SUITE COMPLETE");
-        log.info("  Report: {}", ConfigReader.getInstance().get("extent.report.path"));
+        log.info("  Allure results stored in target/allure-results");
         log.info("========================================");
     }
 
@@ -99,7 +75,6 @@ public class BaseTest {
 
     /**
      * Sets up AndroidDriver before each test method.
-     * Also creates a new ExtentReport test entry.
      *
      * @param method The current @Test method (injected by TestNG)
      */
@@ -108,9 +83,6 @@ public class BaseTest {
         String testName = method.getName();
         log.info("--- Starting Test: {} ---", testName);
 
-        // Create an entry in the HTML report for this test
-        ExtentReportManager.createTest(testName);
-
         // Initialize the AndroidDriver for this test thread
         DriverFactory.initDriver();
         log.info("Driver initialized for test: {}", testName);
@@ -118,8 +90,8 @@ public class BaseTest {
 
     /**
      * Captures results after each test method.
-     * - PASS  → logs success to report
-     * - FAIL  → takes screenshot + logs failure with reason
+     * - PASS  → logs success
+     * - FAIL  → captures failure screenshot & attaches to Allure Report
      * - SKIP  → logs skip reason
      *
      * Always quits the driver regardless of result.
@@ -134,29 +106,18 @@ public class BaseTest {
             switch (result.getStatus()) {
                 case ITestResult.SUCCESS -> {
                     log.info("✅ PASSED: {}", testName);
-                    ExtentReportManager.logPass("Test passed successfully.");
                 }
                 case ITestResult.FAILURE -> {
                     log.error("❌ FAILED: {} — {}", testName, result.getThrowable().getMessage());
-                    // Take screenshot and attach to report
-                    String screenshotPath = ScreenshotUtil.captureScreenshot(
-                            DriverFactory.getDriver(), testName
-                    );
-                    ExtentReportManager.logFail(
-                            result.getThrowable(),
-                            screenshotPath
-                    );
+                    // Capture failure screenshot and attach directly to Allure Report
+                    AllureManager.saveScreenshot(testName, DriverFactory.getDriver());
                 }
                 case ITestResult.SKIP -> {
                     log.warn("⚠️ SKIPPED: {}", testName);
-                    ExtentReportManager.logSkip("Test was skipped: " +
-                            (result.getThrowable() != null
-                                    ? result.getThrowable().getMessage()
-                                    : "No reason provided"));
                 }
             }
         } finally {
-            // CRITICAL: Always quit driver — even if report logging fails
+            // CRITICAL: Always quit driver to prevent session leaks
             DriverFactory.quitDriver();
             log.info("--- Finished Test: {} ---", testName);
         }

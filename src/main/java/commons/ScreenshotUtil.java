@@ -15,9 +15,6 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * ScreenshotUtil — Captures screenshots and saves them to disk.
- *
- * Called automatically by BaseTest on test failure.
- * Screenshot path is returned so ExtentReports can embed it.
  */
 public class ScreenshotUtil {
 

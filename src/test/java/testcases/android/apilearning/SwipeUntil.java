@@ -2,30 +2,36 @@ package testcases.android.apilearning;
 
 import commons.BaseTest;
 import io.appium.java_client.AppiumDriver;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.android.wdio.SwipePage;
-import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 
 /**
- * SwipeUntil — Refactored to Page Object Model (POM).
+ * SwipeUntil — Refactored to Page Object Model (POM) with Allure.
  * TC: Verify conditional swiping until target card 'EXTENDABLE' appears on screen.
  */
+@Epic("API Learning")
+@Feature("Swipe & Scroll Gestures")
 public class SwipeUntil extends BaseTest {
 
-    @Test(description = "Verify conditional horizontal swiping until 'EXTENDABLE' card is found")
+    @Test(
+        description = "Verify conditional horizontal swiping until 'EXTENDABLE' card is found",
+        groups = {"regression"}
+    )
+    @Severity(SeverityLevel.CRITICAL)
     public void testSwipeUntil() {
         SwipePage swipePage = new SwipePage(getDriver());
         swipePage.navigateToSwipeScreen();
-        ExtentReportManager.logInfo("Navigated to Swipe screen.");
 
         String targetCardText = "EXTENDABLE";
         boolean isFound = swipePage.swipeUntilCardVisible(targetCardText, 10);
-        ExtentReportManager.logInfo("Card search result for '" + targetCardText + "': " + isFound);
 
         Assert.assertTrue(isFound, "Target card '" + targetCardText + "' should be found within 10 swipes.");
-        ExtentReportManager.logPass("Verified conditional swipe found target card successfully.");
     }
 
     public static void main(String[] args) {

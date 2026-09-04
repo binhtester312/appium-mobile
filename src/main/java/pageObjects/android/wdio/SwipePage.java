@@ -2,6 +2,7 @@ package pageObjects.android.wdio;
 
 import commons.BasePage;
 import io.appium.java_client.AppiumDriver;
+import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
@@ -13,7 +14,7 @@ import utils.SwipeHelper;
 import java.time.Duration;
 
 /**
- * SwipePage — Page Object for WDIO Demo App Swipe screen with Fluent Method Chaining.
+ * SwipePage — Page Object for WDIO Demo App Swipe screen with Fluent Method Chaining and Allure @Step.
  * All swipe coordinates are calculated using meaningful constants instead of magic numbers.
  */
 public class SwipePage extends BasePage {
@@ -37,6 +38,7 @@ public class SwipePage extends BasePage {
     /**
      * Navigates to Swipe screen via bottom navigation.
      */
+    @Step("Navigate to Swipe screen via bottom navigation")
     public SwipePage navigateToSwipeScreen() {
         log.info("Navigating to Swipe screen.");
         click(SwipeUI.SWIPE_NAV_TAB);
@@ -44,11 +46,13 @@ public class SwipePage extends BasePage {
         return this;
     }
 
+    @Step("Verify if Swipe screen is displayed")
     public boolean isSwipeScreenDisplayed() {
         log.info("Checking if Swipe screen is displayed.");
         return isElementDisplayed(SwipeUI.SWIPE_HEADER);
     }
 
+    @Step("Check if card with text '{cardText}' is displayed")
     public boolean isCardDisplayed(String cardText) {
         By cardLocator = SwipeUI.getCardLocator(cardText);
         return isElementPresent(cardLocator);
@@ -57,6 +61,7 @@ public class SwipePage extends BasePage {
     /**
      * Swipes horizontally to view the next card in the carousel (right to left).
      */
+    @Step("Swipe carousel to next card (Right to Left)")
     public SwipePage swipeCardNext() {
         log.info("Swiping horizontal: Next card (Right to Left).");
         Dimension windowSize = driver.manage().window().getSize();
@@ -75,6 +80,7 @@ public class SwipePage extends BasePage {
     /**
      * Swipes horizontally to view the previous card in the carousel (left to right).
      */
+    @Step("Swipe carousel to previous card (Left to Right)")
     public SwipePage swipeCardPrevious() {
         log.info("Swiping horizontal: Previous card (Left to Right).");
         Dimension windowSize = driver.manage().window().getSize();
@@ -93,6 +99,7 @@ public class SwipePage extends BasePage {
     /**
      * Swipes vertically up (scrolls down the page).
      */
+    @Step("Swipe vertically up (Scroll down page)")
     public SwipePage swipeVerticalUp() {
         log.info("Swiping vertical: Scrolling down (finger moves bottom to top).");
         Dimension windowSize = driver.manage().window().getSize();
@@ -110,6 +117,7 @@ public class SwipePage extends BasePage {
     /**
      * Swipes vertically down (scrolls up the page).
      */
+    @Step("Swipe vertically down (Scroll up page)")
     public SwipePage swipeVerticalDown() {
         log.info("Swiping vertical: Scrolling up (finger moves top to bottom).");
         Dimension windowSize = driver.manage().window().getSize();
@@ -131,6 +139,7 @@ public class SwipePage extends BasePage {
      * @param maxSwipes Maximum number of swipes before giving up
      * @return true if card was found, false otherwise
      */
+    @Step("Swipe horizontally until card containing '{cardText}' is visible (max {maxSwipes} swipes)")
     public boolean swipeUntilCardVisible(String cardText, int maxSwipes) {
         log.info("Swiping until card containing '{}' is visible (max {} swipes)...", cardText, maxSwipes);
         int swipeCount = 0;
