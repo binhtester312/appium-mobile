@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+    TestNGGroups.xml — Run tests grouped by smoke / regression groups
+-->
+<suite name="TestNG Groups Suite" verbose="2" parallel="none">
+
+    <listeners>
+        <listener class-name="listeners.TestListener"/>
+    </listeners>
+
+    <!-- Run Smoke Group: Tests annotated with @Test(groups = {"smoke", ...}) -->
+    <test name="Smoke Group Tests" preserve-order="true">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="testcases.android.LoginTest"/>
+            <class name="testcases.android.apilearning.clickOnElement"/>
+        </classes>
+    </test>
+
+</suite>

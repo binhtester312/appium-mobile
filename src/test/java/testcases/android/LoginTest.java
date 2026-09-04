@@ -57,7 +57,7 @@ public class LoginTest extends BaseTest {
      */
     @Test(
         description = "TC_LOGIN_002: Verify Login screen displays input fields and button",
-        groups = {"smoke"}
+        groups = {"regression"}
     )
     public void verifyLoginPageIsDisplayed() {
         LoginPage loginPage = new LoginPage(getDriver());

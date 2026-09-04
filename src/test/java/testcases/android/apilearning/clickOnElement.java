@@ -14,7 +14,10 @@ import utils.AppiumDriverEx;
  */
 public class clickOnElement extends BaseTest {
 
-    @Test(description = "Verify clicking on Login tab opens Login screen")
+    @Test(
+        description = "Verify clicking on Login tab opens Login screen",
+        groups = {"smoke", "regression"}
+    )
     public void testClickOnElement() {
         LoginPage loginPage = new LoginPage(getDriver());
         loginPage.navigateToLoginScreen();

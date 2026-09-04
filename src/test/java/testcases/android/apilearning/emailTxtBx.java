@@ -15,7 +15,10 @@ import utils.DataGenerator;
  */
 public class emailTxtBx extends BaseTest {
 
-    @Test(description = "Verify entering dynamic email text into the Login email text box")
+    @Test(
+        description = "Verify entering dynamic email text into the Login email text box",
+        groups = {"regression"}
+    )
     public void testEmailTxtBx() {
         LoginPage loginPage = new LoginPage(getDriver());
         loginPage.navigateToLoginScreen();
