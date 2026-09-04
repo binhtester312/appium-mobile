@@ -1,48 +1,44 @@
 package testcases.android.apilearning;
 
-import java.time.Duration;
-
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.Test;
-
-import io.appium.java_client.AppiumBy;
+import commons.BaseTest;
 import io.appium.java_client.AppiumDriver;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import pageObjects.android.wdio.FormsPage;
+import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 
-public class HandleDropdown {
+/**
+ * HandleDropdown — Refactored to Page Object Model (POM).
+ * TC: Verify selecting an option from dropdown in Forms screen.
+ */
+public class HandleDropdown extends BaseTest {
 
-    @Test
+    @Test(description = "Verify selecting option from dropdown in Forms screen")
     public void testHandleDropdown() {
+        FormsPage formsPage = new FormsPage(getDriver());
+        formsPage.navigateToFormsScreen();
+        ExtentReportManager.logInfo("Navigated to Forms screen.");
 
-        // Setup the session
-        AppiumDriver appiumDriver = AppiumDriverEx.getAppiumDriver();
+        String targetOption = "webdriver.io is awesome";
+        formsPage.selectDropdownOption(targetOption);
+        ExtentReportManager.logInfo("Selected dropdown option: " + targetOption);
 
-        // Go to Forms
-        WebElement formsLabel = appiumDriver.findElement(AppiumBy.accessibilityId("Forms"));
-        formsLabel.click();
+        Assert.assertTrue(formsPage.isFormsScreenDisplayed(), "Forms screen should still be displayed after dropdown selection.");
+        ExtentReportManager.logPass("Verified dropdown option selected successfully.");
+    }
 
-        WebDriverWait wait = new WebDriverWait(appiumDriver, Duration.ofSeconds(15));
-
-        // Click on the dropdown element (handles 'Dropdown', 'select-Dropdown', or 'Select an item...')
-        WebElement dropdownMenuElement = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//*[@content-desc='Dropdown' or @content-desc='select-Dropdown' or contains(@text, 'Select an item')]")
-        ));
-        dropdownMenuElement.click();
-
-        // Select the first option
-        WebElement firstOption = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//*[@text='webdriver.io is awesome']")
-        ));
-        firstOption.click();
-
+    public static void main(String[] args) {
+        AppiumDriver driver = AppiumDriverEx.getAppiumDriver();
         try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            FormsPage formsPage = new FormsPage(driver);
+            formsPage.navigateToFormsScreen();
+            formsPage.selectDropdownOption("webdriver.io is awesome");
+            System.out.println(">>> [PASS] Handled dropdown option successfully!");
+        } finally {
+            if (driver != null) {
+                driver.quit();
+            }
         }
     }
 }
-

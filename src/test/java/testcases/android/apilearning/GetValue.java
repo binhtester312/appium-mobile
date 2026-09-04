@@ -1,36 +1,49 @@
 package testcases.android.apilearning;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import io.appium.java_client.AppiumBy;
+import commons.BaseTest;
 import io.appium.java_client.AppiumDriver;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import pageObjects.android.wdio.LoginPage;
+import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 
-public class GetValue {
+/**
+ * GetValue — Refactored to Page Object Model (POM).
+ * TC: Verify getting text value from success alert dialog.
+ */
+public class GetValue extends BaseTest {
+
+    @Test(description = "Verify retrieving text value from alert dialog after login")
+    public void testGetValue() {
+        LoginPage loginPage = new LoginPage(getDriver());
+        loginPage.navigateToLoginScreen();
+        ExtentReportManager.logInfo("Navigated to Login screen.");
+
+        loginPage.login("tuhuynh@maildomain.com", "password");
+        ExtentReportManager.logInfo("Submitted login credentials.");
+
+        String title = loginPage.getAlertTitle();
+        ExtentReportManager.logInfo("Retrieved alert title: " + title);
+
+        Assert.assertEquals(title, "Success", "Alert title should be 'Success'.");
+        loginPage.clickAlertOkButton();
+        ExtentReportManager.logPass("Verified dialog title is 'Success'.");
+    }
 
     public static void main(String[] args) {
-
-        // 1. Launch the target app
-        AppiumDriver appiumDriver = AppiumDriverEx.getAppiumDriver();
-
-        // 2. Click on Login Label
-        WebElement loginLabel = appiumDriver.findElement(AppiumBy.accessibilityId("Login"));
-        loginLabel.click();
-
-        // 3. Input username
-        WebElement emailTxtBx = appiumDriver.findElement(AppiumBy.accessibilityId("input-email"));
-        emailTxtBx.sendKeys("tuhuynh@maildomain.com");
-
-        // 4. Input password
-        WebElement passwordTxtBx = appiumDriver.findElement(AppiumBy.accessibilityId("input-password"));
-        passwordTxtBx.sendKeys("password");
-
-        // 5. Click on Login Btn
-        WebElement loginBtn = appiumDriver.findElement(AppiumBy.accessibilityId("button-LOGIN"));
-        loginBtn.click();
-
-        // 6. Get the title from the dialog
-        WebElement successTitle = appiumDriver.findElement(AppiumBy.id("alert_title"));
-        System.out.println("Dialog Title: " + successTitle.getText());
+        AppiumDriver driver = AppiumDriverEx.getAppiumDriver();
+        try {
+            LoginPage loginPage = new LoginPage(driver);
+            loginPage.navigateToLoginScreen();
+            loginPage.login("tuhuynh@maildomain.com", "password");
+            String title = loginPage.getAlertTitle();
+            System.out.println("Dialog Title: " + title);
+            System.out.println(">>> [PASS] Retrieved value successfully!");
+        } finally {
+            if (driver != null) {
+                driver.quit();
+            }
+        }
     }
 }

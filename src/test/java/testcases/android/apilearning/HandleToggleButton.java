@@ -1,39 +1,53 @@
 package testcases.android.apilearning;
 
-import org.openqa.selenium.WebElement;
-import org.testng.annotations.Test;
-
-import io.appium.java_client.AppiumBy;
+import commons.BaseTest;
 import io.appium.java_client.AppiumDriver;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import pageObjects.android.wdio.FormsPage;
+import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 
-public class HandleToggleButton {
+/**
+ * HandleToggleButton — Refactored to Page Object Model (POM).
+ * TC: Verify toggling the switch button and validating its text change.
+ */
+public class HandleToggleButton extends BaseTest {
 
-    @Test
+    @Test(description = "Verify toggling the switch button changes the switch label text")
     public void testHandleToggleButton() {
+        FormsPage formsPage = new FormsPage(getDriver());
+        formsPage.navigateToFormsScreen();
+        ExtentReportManager.logInfo("Navigated to Forms screen.");
 
-        // Launch an appium session
-        AppiumDriver appiumDriver = AppiumDriverEx.getAppiumDriver();
+        String textBefore = formsPage.getSwitchText();
+        ExtentReportManager.logInfo("Switch text before click: " + textBefore);
 
-        // Click on the [Forms] label
-        WebElement formsLabel = appiumDriver.findElement(AppiumBy.accessibilityId("Forms"));
-        formsLabel.click();
+        formsPage.clickSwitch();
+        ExtentReportManager.logInfo("Clicked on switch button.");
 
-        // Get the toggle label value before interacting with the switch
-        WebElement switchTextElement = appiumDriver.findElement(AppiumBy.accessibilityId("switch-text"));
-        System.out.println("Label Text BEFORE interacting with Toggle button: " + switchTextElement.getText());
+        String textAfter = formsPage.getSwitchText();
+        ExtentReportManager.logInfo("Switch text after click: " + textAfter);
 
-        // Click on the Toggle button
-        WebElement switchElement = appiumDriver.findElement(AppiumBy.accessibilityId("switch"));
-        switchElement.click();
-
-        // Get the toggle label value after interacting with the switch
-        WebElement switchTextElementAfter = appiumDriver.findElement(AppiumBy.accessibilityId("switch-text"));
-        System.out.println("Label Text AFTER interacting with Toggle button: " + switchTextElementAfter.getText());
+        Assert.assertNotEquals(textBefore, textAfter, "Switch text must change after toggling.");
+        ExtentReportManager.logPass("Verified switch toggled successfully.");
     }
 
     public static void main(String[] args) {
-        new HandleToggleButton().testHandleToggleButton();
+        AppiumDriver driver = AppiumDriverEx.getAppiumDriver();
+        try {
+            FormsPage formsPage = new FormsPage(driver);
+            formsPage.navigateToFormsScreen();
+            String before = formsPage.getSwitchText();
+            System.out.println("Label Text BEFORE interacting with Toggle button: " + before);
+            formsPage.clickSwitch();
+            String after = formsPage.getSwitchText();
+            System.out.println("Label Text AFTER interacting with Toggle button: " + after);
+            System.out.println(">>> [PASS] Handled toggle button successfully!");
+        } finally {
+            if (driver != null) {
+                driver.quit();
+            }
+        }
     }
 }
-

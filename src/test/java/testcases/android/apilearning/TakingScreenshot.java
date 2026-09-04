@@ -1,67 +1,80 @@
 package testcases.android.apilearning;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.Duration;
-
+import commons.BaseTest;
+import io.appium.java_client.AppiumDriver;
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import io.appium.java_client.AppiumBy;
-import io.appium.java_client.AppiumDriver;
+import pageObjects.android.wdio.FormsPage;
+import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 
-public class TakingScreenshot {
+import java.io.File;
+import java.io.IOException;
 
-    @Test
+/**
+ * TakingScreenshot — Refactored to Page Object Model (POM).
+ * TC: Interact with Forms screen and capture a screenshot.
+ */
+public class TakingScreenshot extends BaseTest {
+
+    @Test(description = "Verify interacting with Forms screen and capturing screenshot")
     public void testTakingScreenshot() {
+        FormsPage formsPage = new FormsPage(getDriver());
+        formsPage.navigateToFormsScreen();
+        ExtentReportManager.logInfo("Navigated to Forms screen.");
 
-        // Create a session first
-        AppiumDriver appiumDriver = AppiumDriverEx.getAppiumDriver();
-
-        WebDriverWait wait = new WebDriverWait(appiumDriver, Duration.ofSeconds(15));
-
-        // Navigate to forms screen
-        WebElement formsLabel = wait
-                .until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("Forms")));
-        formsLabel.click();
-
-        // Click on toggle button IF it's OFF
-        WebElement switchElement = wait
-                .until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("switch")));
-        WebElement switchTextElement = wait
-                .until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("switch-text")));
-        final boolean isSwitchOn = switchTextElement.getText().equals("Click to turn the switch OFF");
-
-        if (!isSwitchOn) {
-            switchElement.click();
+        // Turn switch ON if it is currently OFF
+        if (!formsPage.isSwitchOn()) {
+            formsPage.clickSwitch();
+            ExtentReportManager.logInfo("Toggled switch ON.");
         }
 
-        // Click on dropdown menu -> select the first option
-        WebElement dropdownMenuElement = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath(
-                        "//*[@content-desc='Dropdown' or @content-desc='select-Dropdown' or contains(@text, 'Select an item')]")));
-        dropdownMenuElement.click();
+        // Select dropdown option
+        formsPage.selectDropdownOption("webdriver.io is awesome");
+        ExtentReportManager.logInfo("Selected dropdown option.");
 
-        WebElement firstOption = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//*[@text='webdriver.io is awesome']")));
-        firstOption.click();
-
-        // Taking a screenshot
-        File formScreenBase64Data = ((TakesScreenshot) appiumDriver).getScreenshotAs(OutputType.FILE);
-        String formScreenFilePath = System.getProperty("user.dir") + "/screenshot/" + "formsScreen.png";
+        // Capture screenshot
+        File screenshotFile = ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.FILE);
+        String destinationPath = System.getProperty("user.dir") + "/screenshot/formsScreen.png";
+        File destFile = new File(destinationPath);
 
         try {
-            FileUtils.copyFile(formScreenBase64Data, new File(formScreenFilePath));
-            System.out.println("Screenshot saved successfully to: " + formScreenFilePath);
+            FileUtils.copyFile(screenshotFile, destFile);
+            ExtentReportManager.logInfo("Screenshot saved to: " + destinationPath);
         } catch (IOException e) {
+            Assert.fail("Failed to save screenshot: " + e.getMessage());
+        }
+
+        Assert.assertTrue(destFile.exists(), "Screenshot file should exist on disk.");
+        ExtentReportManager.logPass("Verified screenshot capture completed successfully.");
+    }
+
+    public static void main(String[] args) {
+        AppiumDriver driver = AppiumDriverEx.getAppiumDriver();
+        try {
+            FormsPage formsPage = new FormsPage(driver);
+            formsPage.navigateToFormsScreen();
+
+            if (!formsPage.isSwitchOn()) {
+                formsPage.clickSwitch();
+            }
+
+            formsPage.selectDropdownOption("webdriver.io is awesome");
+
+            File screenshotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            String destinationPath = System.getProperty("user.dir") + "/screenshot/formsScreen.png";
+            FileUtils.copyFile(screenshotFile, new File(destinationPath));
+            System.out.println("Screenshot saved successfully to: " + destinationPath);
+            System.out.println(">>> [PASS] Took screenshot successfully!");
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (driver != null) {
+                driver.quit();
+            }
         }
     }
 }

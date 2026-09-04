@@ -143,6 +143,28 @@ public class BasePage {
         wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
     }
 
+    protected List<WebElement> waitForNumberOfElements(By locator, int count) {
+        try {
+            disableImplicitWait();
+            wait.until(ExpectedConditions.numberOfElementsToBe(locator, count));
+            return driver.findElements(locator);
+        } finally {
+            restoreImplicitWait();
+        }
+    }
+
+    protected boolean isElementDisplayed(By locator) {
+        try {
+            disableImplicitWait();
+            WebElement element = shortWait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            return element != null && element.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        } finally {
+            restoreImplicitWait();
+        }
+    }
+
     protected void sleep(long milliseconds) {
         try {
             Thread.sleep(milliseconds);
