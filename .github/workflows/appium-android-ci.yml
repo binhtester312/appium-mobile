@@ -1,0 +1,137 @@
+name: Appium Android CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'TestNG Suite XML file to run'
+        required: false
+        default: 'src/test/resources/testng.xml'
+        type: choice
+        options:
+          - 'src/test/resources/testng.xml'
+          - 'src/test/resources/suites/testng_smoke.xml'
+          - 'src/test/resources/suites/testng_regression.xml'
+          - 'src/test/resources/suites/testng_apilearning.xml'
+          - 'src/test/resources/suites/TestNGGroups.xml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  android-test:
+    name: Run Appium Android Tests
+    runs-on: macos-14
+    timeout-minutes: 60
+
+    steps:
+      # 1. Checkout Repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Java 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # 3. Setup Node.js & Appium
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Appium & UiAutomator2 Driver
+        run: |
+          npm install -g appium@latest
+          appium driver install uiautomator2
+          appium --version
+          appium driver list
+
+      # 4. Download Target Mobile App (WebdriverIO Demo APK)
+      - name: Download Test APK
+        run: |
+          if [ ! -f "android.wdio.native.app.v2.2.0.apk" ]; then
+            echo "📥 Downloading WDIO Native Demo APK..."
+            curl -L -o android.wdio.native.app.v2.2.0.apk https://github.com/webdriverio/native-demo-app/releases/download/v2.2.0/android.wdio.native.app.v2.2.0.apk
+          fi
+          ls -la android.wdio.native.app.v2.2.0.apk
+
+      # 5. Start Appium Server in Background
+      - name: Start Appium Server
+        run: |
+          nohup appium --allow-cors --log appium.log > /dev/null 2>&1 &
+          echo "Waiting for Appium server to start..."
+          for i in {1..15}; do
+            if curl -s http://127.0.0.1:4723/status | grep -q '"ready":true'; then
+              echo "✅ Appium Server is UP and READY!"
+              break
+            fi
+            echo "Waiting for Appium ($i)..."
+            sleep 2
+          done
+
+      # 6. Launch Android Emulator & Run Tests
+      - name: Run Appium Tests on Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: arm64-v8a
+          profile: pixel_6
+          disable-animations: true
+          force-avd-creation: false
+          emulator-boot-timeout: 600
+          script: |
+            echo "📱 Devices list:"
+            adb devices
+            
+            echo "📦 Pre-installing demo APK..."
+            adb install -r android.wdio.native.app.v2.2.0.apk
+            
+            echo "🚀 Executing Maven TestNG Suite..."
+            SUITE_FILE="${{ github.event.inputs.suite }}"
+            if [ -z "$SUITE_FILE" ]; then
+              SUITE_FILE="src/test/resources/testng.xml"
+            fi
+            
+            mvn clean test -DsuiteXmlFile="$SUITE_FILE" -Dtarget.platform=android
+
+      # 7. Generate Allure Report
+      - name: Generate Allure Report
+        if: always()
+        run: |
+          mvn allure:report || echo "Allure report generation skipped"
+
+      # 8. Upload Allure Results & Report
+      - name: Upload Allure Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: |
+            target/site/allure-maven-plugin/
+            target/allure-results/
+          retention-days: 14
+
+      # 9. Upload Screenshots & Videos
+      - name: Upload Test Media & Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-media-and-logs
+          path: |
+            test-output/
+            screenshots/
+            screenshot/
+            videos/
+            appium.log
+          retention-days: 14
