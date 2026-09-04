@@ -1,6 +1,9 @@
 name: Appium Android CI/CD
 
 on:
+  # Chạy tự động mỗi đêm lúc 00:00 AM (GMT+7 - Giờ VN), tức 17:00 UTC
+  schedule:
+    - cron: '0 17 * * *'
   push:
     branches: [ main ]
   pull_request:
