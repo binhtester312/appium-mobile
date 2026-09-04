@@ -14,10 +14,21 @@ import java.time.Duration;
 
 /**
  * SwipePage — Page Object for WDIO Demo App Swipe screen with Fluent Method Chaining.
+ * All swipe coordinates are calculated using meaningful constants instead of magic numbers.
  */
 public class SwipePage extends BasePage {
 
     private static final Logger log = LoggerFactory.getLogger(SwipePage.class);
+
+    // ─── Gesture Ratios & Timing Constants ───────────────────────────────────
+    private static final double CAROUSEL_Y_RATIO = 0.65;
+    private static final double HORIZONTAL_START_X_RATIO = 0.80;
+    private static final double HORIZONTAL_END_X_RATIO = 0.10;
+    private static final double VERTICAL_START_Y_RATIO = 0.80;
+    private static final double VERTICAL_END_Y_RATIO = 0.20;
+    private static final Duration HORIZONTAL_SWIPE_DURATION = Duration.ofMillis(500);
+    private static final Duration VERTICAL_SWIPE_DURATION = Duration.ofMillis(800);
+    private static final long UI_STABILIZE_PAUSE_MS = 800L;
 
     public SwipePage(AppiumDriver driver) {
         super(driver);
@@ -52,12 +63,12 @@ public class SwipePage extends BasePage {
         int screenHeight = windowSize.getHeight();
         int screenWidth = windowSize.getWidth();
 
-        int yMid = (int) (screenHeight * 0.65);
-        Point startPoint = new Point((int) (screenWidth * 0.80), yMid);
-        Point endPoint = new Point((int) (screenWidth * 0.10), yMid);
+        int yMid = (int) (screenHeight * CAROUSEL_Y_RATIO);
+        Point startPoint = new Point((int) (screenWidth * HORIZONTAL_START_X_RATIO), yMid);
+        Point endPoint = new Point((int) (screenWidth * HORIZONTAL_END_X_RATIO), yMid);
 
-        SwipeHelper.swipe(driver, startPoint, endPoint, Duration.ofMillis(500));
-        sleep(800);
+        SwipeHelper.swipe(driver, startPoint, endPoint, HORIZONTAL_SWIPE_DURATION);
+        sleep(UI_STABILIZE_PAUSE_MS);
         return this;
     }
 
@@ -70,12 +81,12 @@ public class SwipePage extends BasePage {
         int screenHeight = windowSize.getHeight();
         int screenWidth = windowSize.getWidth();
 
-        int yMid = (int) (screenHeight * 0.65);
-        Point startPoint = new Point((int) (screenWidth * 0.80), yMid);
-        Point endPoint = new Point((int) (screenWidth * 0.80), yMid);
+        int yMid = (int) (screenHeight * CAROUSEL_Y_RATIO);
+        Point startPoint = new Point((int) (screenWidth * HORIZONTAL_START_X_RATIO), yMid);
+        Point endPoint = new Point((int) (screenWidth * HORIZONTAL_END_X_RATIO), yMid);
 
-        SwipeHelper.swipe(driver, startPoint, endPoint, Duration.ofMillis(500));
-        sleep(800);
+        SwipeHelper.swipe(driver, startPoint, endPoint, HORIZONTAL_SWIPE_DURATION);
+        sleep(UI_STABILIZE_PAUSE_MS);
         return this;
     }
 
@@ -88,11 +99,11 @@ public class SwipePage extends BasePage {
         int screenHeight = windowSize.getHeight();
         int screenWidth = windowSize.getWidth();
 
-        Point startPoint = new Point(screenWidth / 2, (int) (screenHeight * 0.80));
-        Point endPoint = new Point(screenWidth / 2, (int) (screenHeight * 0.20));
+        Point startPoint = new Point(screenWidth / 2, (int) (screenHeight * VERTICAL_START_Y_RATIO));
+        Point endPoint = new Point(screenWidth / 2, (int) (screenHeight * VERTICAL_END_Y_RATIO));
 
-        SwipeHelper.swipe(driver, startPoint, endPoint, Duration.ofMillis(800));
-        sleep(800);
+        SwipeHelper.swipe(driver, startPoint, endPoint, VERTICAL_SWIPE_DURATION);
+        sleep(UI_STABILIZE_PAUSE_MS);
         return this;
     }
 
@@ -105,11 +116,11 @@ public class SwipePage extends BasePage {
         int screenHeight = windowSize.getHeight();
         int screenWidth = windowSize.getWidth();
 
-        Point startPoint = new Point(screenWidth / 2, (int) (screenHeight * 0.20));
-        Point endPoint = new Point(screenWidth / 2, (int) (screenHeight * 0.80));
+        Point startPoint = new Point(screenWidth / 2, (int) (screenHeight * VERTICAL_END_Y_RATIO));
+        Point endPoint = new Point(screenWidth / 2, (int) (screenHeight * VERTICAL_START_Y_RATIO));
 
-        SwipeHelper.swipe(driver, startPoint, endPoint, Duration.ofMillis(800));
-        sleep(800);
+        SwipeHelper.swipe(driver, startPoint, endPoint, VERTICAL_SWIPE_DURATION);
+        sleep(UI_STABILIZE_PAUSE_MS);
         return this;
     }
 

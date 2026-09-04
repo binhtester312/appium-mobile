@@ -8,12 +8,13 @@ import org.testng.annotations.Test;
 import pageObjects.android.wdio.LoginPage;
 import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
+import utils.DataGenerator;
 import utils.DeviceHelper;
 
 import java.io.File;
 
 /**
- * RecordVideo — Refactored to Page Object Model (POM).
+ * RecordVideo — Refactored to Page Object Model (POM) with Dynamic Data.
  * TC: Record screen video while executing Login test flow and save to /videos.
  */
 public class RecordVideo extends BaseTest {
@@ -28,15 +29,17 @@ public class RecordVideo extends BaseTest {
 
         String videoPath = null;
         try {
-            // 2. Perform Login Page interactions
+            // 2. Perform Login Page interactions with Dynamic Data
             LoginPage loginPage = new LoginPage(androidDriver);
-            loginPage.navigateToLoginScreen();
-            ExtentReportManager.logInfo("Navigated to Login screen.");
+            String dynamicEmail = DataGenerator.generateEmail("video");
+            String dynamicPassword = DataGenerator.generatePassword();
 
-            loginPage.login("test@maildomain.com", "password");
-            ExtentReportManager.logInfo("Submitted login credentials.");
+            loginPage.navigateToLoginScreen()
+                    .login(dynamicEmail, dynamicPassword);
 
+            ExtentReportManager.logInfo("Submitted login credentials for: " + dynamicEmail);
             Assert.assertTrue(loginPage.isAlertDisplayed(), "Success/Alert dialog should be displayed.");
+            loginPage.clickAlertOkButton();
 
         } finally {
             // 3. Stop recording and save video
@@ -57,8 +60,10 @@ public class RecordVideo extends BaseTest {
             System.out.println(">>> [RECORD] Bắt đầu ghi màn hình...");
 
             LoginPage loginPage = new LoginPage(androidDriver);
-            loginPage.navigateToLoginScreen();
-            loginPage.login("test@maildomain.com", "password");
+            String email = DataGenerator.generateEmail("main_video");
+            String password = DataGenerator.generatePassword();
+
+            loginPage.navigateToLoginScreen().login(email, password).clickAlertOkButton();
 
             String videoPath = DeviceHelper.stopRecordingAndSave(androidDriver, "mainRecordVideo");
             System.out.println(">>> [RECORD] Video đã lưu tại: " + videoPath);

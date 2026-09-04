@@ -7,10 +7,11 @@ import org.testng.annotations.Test;
 import pageObjects.android.wdio.LoginPage;
 import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
+import utils.DataGenerator;
 
 /**
- * setValues — Refactored to Page Object Model (POM) with Fluent Method Chaining.
- * TC: Input email and password, then submit login form.
+ * setValues — Refactored to Page Object Model (POM) with Fluent Method Chaining & Dynamic Test Data.
+ * TC: Input dynamic email and password, then submit login form.
  */
 public class setValues extends BaseTest {
 
@@ -18,33 +19,40 @@ public class setValues extends BaseTest {
     public void testSetValues() {
         LoginPage loginPage = new LoginPage(getDriver());
 
+        String dynamicEmail = DataGenerator.generateEmail("setvalues");
+        String dynamicPassword = DataGenerator.generatePassword();
+
         // Fluent Method Chaining: Navigate -> Enter Credentials -> Submit -> Check Alert State
         boolean isAlertShown = loginPage
                 .navigateToLoginScreen()
-                .enterEmail("nhubinh@maildomain.com")
-                .enterPassword("12345678")
+                .enterEmail(dynamicEmail)
+                .enterPassword(dynamicPassword)
                 .tapLoginButton()
                 .isAlertDisplayed();
 
+        ExtentReportManager.logInfo("Generated dynamic email: " + dynamicEmail);
         ExtentReportManager.logInfo("Alert dialog displayed state: " + isAlertShown);
 
         Assert.assertTrue(isAlertShown, "Success/Alert dialog should appear after login submission.");
         loginPage.clickAlertOkButton();
-        ExtentReportManager.logPass("Verified login form submitted successfully using Method Chaining.");
+        ExtentReportManager.logPass("Verified login form submitted successfully using Dynamic Data & Method Chaining.");
     }
 
     public static void main(String[] args) {
         AppiumDriver driver = AppiumDriverEx.getAppiumDriver();
         try {
+            String email = DataGenerator.generateEmail("main");
+            String password = DataGenerator.generatePassword();
+
             boolean isAlert = new LoginPage(driver)
                     .navigateToLoginScreen()
-                    .enterEmail("nhubinh@maildomain.com")
-                    .enterPassword("12345678")
+                    .enterEmail(email)
+                    .enterPassword(password)
                     .tapLoginButton()
                     .isAlertDisplayed();
 
             System.out.println("Alert displayed: " + isAlert);
-            System.out.println(">>> [PASS] Set values and submitted login successfully with Method Chaining!");
+            System.out.println(">>> [PASS] Set values and submitted login successfully with Dynamic Data!");
         } finally {
             if (driver != null) {
                 driver.quit();

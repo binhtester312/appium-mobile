@@ -165,6 +165,10 @@ public class BasePage {
         }
     }
 
+    public pageObjects.android.wdio.BottomNavComponent getBottomNav() {
+        return new pageObjects.android.wdio.BottomNavComponent(driver);
+    }
+
     protected void sleep(long milliseconds) {
         try {
             Thread.sleep(milliseconds);
@@ -172,6 +176,4 @@ public class BasePage {
             Thread.currentThread().interrupt();
         }
     }
-
-
 }

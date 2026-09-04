@@ -3,13 +3,12 @@ package testcases;
 import commons.BaseTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import pageObjects.android.LoginPage;
-import pageObjects.android.ProductsPage;
+import pageObjects.android.saucelabs.LoginPage;
+import pageObjects.android.saucelabs.ProductsPage;
 import reports.ExtentReportManager;
 
 /**
- * FirstScriptAndroiTest — Refactored to strictly adhere to Page Object Model (POM).
- * Extends BaseTest to automatically leverage driver management, reporting, and screenshot capture.
+ * FirstScriptAndroiTest — Sauce Labs Demo App sample tests with Page Object Model.
  */
 public class FirstScriptAndroiTest extends BaseTest {
 

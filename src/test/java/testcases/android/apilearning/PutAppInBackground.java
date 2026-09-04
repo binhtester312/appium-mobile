@@ -8,12 +8,13 @@ import org.testng.annotations.Test;
 import pageObjects.android.wdio.LoginPage;
 import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
+import utils.DataGenerator;
 import utils.DeviceHelper;
 
 import java.time.Duration;
 
 /**
- * PutAppInBackground — Refactored to Page Object Model (POM).
+ * PutAppInBackground — Refactored to Page Object Model (POM) with Dynamic Data.
  * TC: Put app into background, modify Wi-Fi settings, return to app and dismiss dialog.
  */
 public class PutAppInBackground extends BaseTest {
@@ -22,13 +23,14 @@ public class PutAppInBackground extends BaseTest {
     public void testPutAppInBackground() {
         AndroidDriver androidDriver = (AndroidDriver) getDriver();
 
-        // 1. Perform login
+        // 1. Perform login with dynamic data
         LoginPage loginPage = new LoginPage(androidDriver);
-        loginPage.navigateToLoginScreen();
-        ExtentReportManager.logInfo("Navigated to Login screen.");
+        String dynamicEmail = DataGenerator.generateEmail("background");
+        String dynamicPassword = DataGenerator.generatePassword();
 
-        loginPage.login("nhubinh@maildomain.com", "12345678");
-        ExtentReportManager.logInfo("Submitted login credentials.");
+        loginPage.navigateToLoginScreen()
+                .login(dynamicEmail, dynamicPassword);
+        ExtentReportManager.logInfo("Submitted login credentials for: " + dynamicEmail);
 
         // 2. Put app in background indefinitely
         DeviceHelper.putAppInBackground(androidDriver, Duration.ofSeconds(-1));
@@ -59,8 +61,11 @@ public class PutAppInBackground extends BaseTest {
         AndroidDriver androidDriver = (AndroidDriver) driver;
         try {
             LoginPage loginPage = new LoginPage(androidDriver);
-            loginPage.navigateToLoginScreen();
-            loginPage.login("nhubinh@maildomain.com", "12345678");
+            String email = DataGenerator.generateEmail("main_bg");
+            String password = DataGenerator.generatePassword();
+
+            loginPage.navigateToLoginScreen()
+                    .login(email, password);
 
             DeviceHelper.putAppInBackground(androidDriver, Duration.ofSeconds(-1));
             DeviceHelper.openWifiSettings(androidDriver);
@@ -70,7 +75,7 @@ public class PutAppInBackground extends BaseTest {
             DeviceHelper.activateApp(androidDriver, "com.wdiodemoapp");
             loginPage.clickAlertOkButton();
 
-            System.out.println(">>> [PASS] Put app in background and resumed successfully!");
+            System.out.println(">>> [PASS] Put app in background and resumed successfully with Dynamic Data!");
         } finally {
             if (androidDriver != null) {
                 androidDriver.quit();
