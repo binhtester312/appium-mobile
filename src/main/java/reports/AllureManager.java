@@ -1,19 +1,18 @@
 package reports;
 
 import io.appium.java_client.AppiumDriver;
+import io.qameta.allure.Allure;
 import io.qameta.allure.Attachment;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.util.Base64;
 
 /**
  * AllureManager — Manages Allure Report attachments (Screenshots, Screen Recordings, Text Logs).
- *
- * Allure uses @Attachment annotations to automatically bind returned byte arrays / strings
- * to the corresponding test case node in the interactive HTML report.
  */
 public class AllureManager {
 
@@ -37,7 +36,8 @@ public class AllureManager {
         }
         try {
             byte[] screenshotBytes = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-            log.info("Attached failure screenshot to Allure for test: {}", testName);
+            Allure.addAttachment("📸 Screenshot: " + testName, "image/png", new ByteArrayInputStream(screenshotBytes), "png");
+            log.info("Attached screenshot to Allure for: {}", testName);
             return screenshotBytes;
         } catch (Exception e) {
             log.error("Failed to capture screenshot for Allure: {}", e.getMessage());
@@ -58,8 +58,14 @@ public class AllureManager {
             log.warn("Cannot attach empty video bytes to Allure.");
             return new byte[0];
         }
-        log.info("Attached screen recording video to Allure: {} ({} bytes)", videoTitle, videoBytes.length);
-        return videoBytes;
+        try {
+            Allure.addAttachment("🎥 Video Recording: " + videoTitle, "video/mp4", new ByteArrayInputStream(videoBytes), "mp4");
+            log.info("Attached screen recording video to Allure: {} ({} bytes)", videoTitle, videoBytes.length);
+            return videoBytes;
+        } catch (Exception e) {
+            log.error("Failed to attach video to Allure: {}", e.getMessage());
+            return videoBytes;
+        }
     }
 
     /**
@@ -92,6 +98,9 @@ public class AllureManager {
      */
     @Attachment(value = "{logTitle}", type = "text/plain")
     public static String saveTextLog(String logTitle, String message) {
+        try {
+            Allure.addAttachment(logTitle, "text/plain", message);
+        } catch (Exception ignored) {}
         return message;
     }
 }
