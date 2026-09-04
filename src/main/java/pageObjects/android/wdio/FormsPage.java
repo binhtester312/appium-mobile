@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import pageUIs.android.wdio.FormsUI;
 
 /**
- * FormsPage — Page Object for WDIO Demo App Forms screen.
+ * FormsPage — Page Object for WDIO Demo App Forms screen with Fluent Method Chaining.
  */
 public class FormsPage extends BasePage {
 
@@ -21,14 +21,16 @@ public class FormsPage extends BasePage {
     /**
      * Navigates to Forms screen via bottom navigation.
      */
-    public void navigateToFormsScreen() {
+    public FormsPage navigateToFormsScreen() {
         log.info("Navigating to Forms screen.");
         click(FormsUI.FORMS_NAV_TAB);
+        return this;
     }
 
-    public void enterTextInput(String text) {
+    public FormsPage enterTextInput(String text) {
         log.info("Entering text into input field: {}", text);
         sendKeys(FormsUI.TEXT_INPUT, text);
+        return this;
     }
 
     public String getTextInputResult() {
@@ -36,9 +38,10 @@ public class FormsPage extends BasePage {
         return getText(FormsUI.INPUT_RESULT);
     }
 
-    public void clickSwitch() {
+    public FormsPage clickSwitch() {
         log.info("Toggling switch button.");
         click(FormsUI.SWITCH);
+        return this;
     }
 
     public String getSwitchText() {
@@ -51,24 +54,27 @@ public class FormsPage extends BasePage {
         return text != null && text.contains("OFF"); // When it says "Click to turn the switch OFF", it is currently ON
     }
 
-    public void turnSwitch(boolean turnOn) {
+    public FormsPage turnSwitch(boolean turnOn) {
         log.info("Turning switch to: {}", turnOn ? "ON" : "OFF");
         boolean currentState = isSwitchOn();
         if (currentState != turnOn) {
             clickSwitch();
         }
+        return this;
     }
 
-    public void openDropdown() {
+    public FormsPage openDropdown() {
         log.info("Opening dropdown menu.");
         click(FormsUI.DROPDOWN_MENU);
+        return this;
     }
 
-    public void selectDropdownOption(String optionText) {
+    public FormsPage selectDropdownOption(String optionText) {
         log.info("Selecting dropdown option: {}", optionText);
         openDropdown();
         By optionLocator = FormsUI.getDropdownOption(optionText);
         click(optionLocator);
+        return this;
     }
 
     public boolean isFormsScreenDisplayed() {

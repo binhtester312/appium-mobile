@@ -9,37 +9,42 @@ import reports.ExtentReportManager;
 import utils.AppiumDriverEx;
 
 /**
- * GetValue — Refactored to Page Object Model (POM).
+ * GetValue — Refactored to Page Object Model (POM) with Fluent Method Chaining.
  * TC: Verify getting text value from success alert dialog.
  */
 public class GetValue extends BaseTest {
 
-    @Test(description = "Verify retrieving text value from alert dialog after login")
+    @Test(description = "Verify retrieving text value from alert dialog after login using method chaining")
     public void testGetValue() {
         LoginPage loginPage = new LoginPage(getDriver());
-        loginPage.navigateToLoginScreen();
-        ExtentReportManager.logInfo("Navigated to Login screen.");
 
-        loginPage.login("tuhuynh@maildomain.com", "password");
-        ExtentReportManager.logInfo("Submitted login credentials.");
+        // Fluent Method Chaining: Navigate -> Enter Credentials -> Submit -> Retrieve Alert Title
+        String title = loginPage
+                .navigateToLoginScreen()
+                .enterEmail("tuhuynh@maildomain.com")
+                .enterPassword("password")
+                .tapLoginButton()
+                .getAlertTitle();
 
-        String title = loginPage.getAlertTitle();
         ExtentReportManager.logInfo("Retrieved alert title: " + title);
 
         Assert.assertEquals(title, "Success", "Alert title should be 'Success'.");
         loginPage.clickAlertOkButton();
-        ExtentReportManager.logPass("Verified dialog title is 'Success'.");
+        ExtentReportManager.logPass("Verified dialog title is 'Success' using Method Chaining.");
     }
 
     public static void main(String[] args) {
         AppiumDriver driver = AppiumDriverEx.getAppiumDriver();
         try {
-            LoginPage loginPage = new LoginPage(driver);
-            loginPage.navigateToLoginScreen();
-            loginPage.login("tuhuynh@maildomain.com", "password");
-            String title = loginPage.getAlertTitle();
+            String title = new LoginPage(driver)
+                    .navigateToLoginScreen()
+                    .enterEmail("tuhuynh@maildomain.com")
+                    .enterPassword("password")
+                    .tapLoginButton()
+                    .getAlertTitle();
+
             System.out.println("Dialog Title: " + title);
-            System.out.println(">>> [PASS] Retrieved value successfully!");
+            System.out.println(">>> [PASS] Retrieved value successfully with Method Chaining!");
         } finally {
             if (driver != null) {
                 driver.quit();

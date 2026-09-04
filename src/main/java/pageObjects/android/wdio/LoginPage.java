@@ -10,7 +10,7 @@ import pageUIs.android.wdio.LoginUI;
 import java.util.List;
 
 /**
- * LoginPage — Page Object for WDIO Demo App Login screen.
+ * LoginPage — Page Object for WDIO Demo App Login screen with Fluent Method Chaining.
  */
 public class LoginPage extends BasePage {
 
@@ -23,7 +23,7 @@ public class LoginPage extends BasePage {
     /**
      * Navigates to the Login screen via bottom navigation.
      */
-    public void navigateToLoginScreen() {
+    public LoginPage navigateToLoginScreen() {
         log.info("Navigating to Login screen.");
         if (isElementPresent(LoginUI.ALERT_OK_BUTTON)) {
             try {
@@ -32,31 +32,35 @@ public class LoginPage extends BasePage {
             } catch (Exception ignored) {}
         }
         click(LoginUI.LOGIN_NAV_TAB);
+        return this;
     }
 
-    public void enterEmail(String email) {
+    public LoginPage enterEmail(String email) {
         log.info("Entering email: {}", email);
         sendKeys(LoginUI.EMAIL_INPUT, email);
+        return this;
     }
 
-    public void enterPassword(String password) {
+    public LoginPage enterPassword(String password) {
         log.info("Entering password.");
         sendKeys(LoginUI.PASSWORD_INPUT, password);
+        return this;
     }
 
-    public void tapLoginButton() {
+    public LoginPage tapLoginButton() {
         log.info("Tapping Login button.");
         click(LoginUI.LOGIN_BUTTON);
+        return this;
     }
 
     /**
-     * Performs full login flow.
+     * Performs full login flow using chained actions.
      */
-    public void login(String email, String password) {
+    public LoginPage login(String email, String password) {
         log.info("Performing login for: {}", email);
-        enterEmail(email);
-        enterPassword(password);
-        tapLoginButton();
+        return enterEmail(email)
+                .enterPassword(password)
+                .tapLoginButton();
     }
 
     public String getAlertTitle() {
@@ -69,9 +73,10 @@ public class LoginPage extends BasePage {
         return getText(LoginUI.ALERT_MESSAGE);
     }
 
-    public void clickAlertOkButton() {
+    public LoginPage clickAlertOkButton() {
         log.info("Clicking alert dialog OK button.");
         click(LoginUI.ALERT_OK_BUTTON);
+        return this;
     }
 
     public int getLoginTextElementsCount() {
@@ -80,14 +85,15 @@ public class LoginPage extends BasePage {
         return elements.size();
     }
 
-    public void clickLoginTextElementAt(int index) {
+    public LoginPage clickLoginTextElementAt(int index) {
         log.info("Clicking Login text element at index: {}", index);
         List<WebElement> elements = waitForNumberOfElements(LoginUI.LOGIN_TEXT_ELEMENTS, 2);
         if (index < elements.size()) {
             elements.get(index).click();
         } else {
-            throw(new IndexOutOfBoundsException("Index " + index + " out of bounds for size " + elements.size()));
+            throw new IndexOutOfBoundsException("Index " + index + " out of bounds for size " + elements.size());
         }
+        return this;
     }
 
     public boolean isLoginScreenDisplayed() {

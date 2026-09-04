@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import pageUIs.android.wdio.BottomNavUI;
 
 /**
- * BottomNavComponent — Handles bottom navigation across all WDIO app screens.
+ * BottomNavComponent — Handles bottom navigation across all WDIO app screens with Page Transition Chaining.
  */
 public class BottomNavComponent extends BasePage {
 
@@ -17,33 +17,39 @@ public class BottomNavComponent extends BasePage {
         super(driver);
     }
 
-    public void tapHomeTab() {
+    public BottomNavComponent tapHomeTab() {
         log.info("Tapping Home tab.");
         click(BottomNavUI.HOME_TAB);
+        return this;
     }
 
-    public void tapWebviewTab() {
+    public BottomNavComponent tapWebviewTab() {
         log.info("Tapping Webview tab.");
         click(BottomNavUI.WEBVIEW_TAB);
+        return this;
     }
 
-    public void tapLoginTab() {
+    public LoginPage tapLoginTab() {
         log.info("Tapping Login tab.");
         click(BottomNavUI.LOGIN_TAB);
+        return new LoginPage(driver);
     }
 
-    public void tapFormsTab() {
+    public FormsPage tapFormsTab() {
         log.info("Tapping Forms tab.");
         click(BottomNavUI.FORMS_TAB);
+        return new FormsPage(driver);
     }
 
-    public void tapSwipeTab() {
+    public SwipePage tapSwipeTab() {
         log.info("Tapping Swipe tab.");
         click(BottomNavUI.SWIPE_TAB);
+        return new SwipePage(driver);
     }
 
-    public void tapDragTab() {
+    public BottomNavComponent tapDragTab() {
         log.info("Tapping Drag tab.");
         click(BottomNavUI.DRAG_TAB);
+        return this;
     }
 }

@@ -13,7 +13,7 @@ import utils.SwipeHelper;
 import java.time.Duration;
 
 /**
- * SwipePage — Page Object for WDIO Demo App Swipe screen.
+ * SwipePage — Page Object for WDIO Demo App Swipe screen with Fluent Method Chaining.
  */
 public class SwipePage extends BasePage {
 
@@ -26,10 +26,11 @@ public class SwipePage extends BasePage {
     /**
      * Navigates to Swipe screen via bottom navigation.
      */
-    public void navigateToSwipeScreen() {
+    public SwipePage navigateToSwipeScreen() {
         log.info("Navigating to Swipe screen.");
         click(SwipeUI.SWIPE_NAV_TAB);
         waitForVisibility(SwipeUI.SWIPE_HEADER);
+        return this;
     }
 
     public boolean isSwipeScreenDisplayed() {
@@ -45,7 +46,7 @@ public class SwipePage extends BasePage {
     /**
      * Swipes horizontally to view the next card in the carousel (right to left).
      */
-    public void swipeCardNext() {
+    public SwipePage swipeCardNext() {
         log.info("Swiping horizontal: Next card (Right to Left).");
         Dimension windowSize = driver.manage().window().getSize();
         int screenHeight = windowSize.getHeight();
@@ -57,29 +58,31 @@ public class SwipePage extends BasePage {
 
         SwipeHelper.swipe(driver, startPoint, endPoint, Duration.ofMillis(500));
         sleep(800);
+        return this;
     }
 
     /**
      * Swipes horizontally to view the previous card in the carousel (left to right).
      */
-    public void swipeCardPrevious() {
+    public SwipePage swipeCardPrevious() {
         log.info("Swiping horizontal: Previous card (Left to Right).");
         Dimension windowSize = driver.manage().window().getSize();
         int screenHeight = windowSize.getHeight();
         int screenWidth = windowSize.getWidth();
 
         int yMid = (int) (screenHeight * 0.65);
-        Point startPoint = new Point((int) (screenWidth * 0.10), yMid);
+        Point startPoint = new Point((int) (screenWidth * 0.80), yMid);
         Point endPoint = new Point((int) (screenWidth * 0.80), yMid);
 
         SwipeHelper.swipe(driver, startPoint, endPoint, Duration.ofMillis(500));
         sleep(800);
+        return this;
     }
 
     /**
      * Swipes vertically up (scrolls down the page).
      */
-    public void swipeVerticalUp() {
+    public SwipePage swipeVerticalUp() {
         log.info("Swiping vertical: Scrolling down (finger moves bottom to top).");
         Dimension windowSize = driver.manage().window().getSize();
         int screenHeight = windowSize.getHeight();
@@ -90,12 +93,13 @@ public class SwipePage extends BasePage {
 
         SwipeHelper.swipe(driver, startPoint, endPoint, Duration.ofMillis(800));
         sleep(800);
+        return this;
     }
 
     /**
      * Swipes vertically down (scrolls up the page).
      */
-    public void swipeVerticalDown() {
+    public SwipePage swipeVerticalDown() {
         log.info("Swiping vertical: Scrolling up (finger moves top to bottom).");
         Dimension windowSize = driver.manage().window().getSize();
         int screenHeight = windowSize.getHeight();
@@ -106,6 +110,7 @@ public class SwipePage extends BasePage {
 
         SwipeHelper.swipe(driver, startPoint, endPoint, Duration.ofMillis(800));
         sleep(800);
+        return this;
     }
 
     /**
