@@ -14,18 +14,17 @@ import utils.AppiumDriverEx;
 import java.time.Duration;
 import java.util.Collections;
 
-public class SwipeVertically {
+public class SwipeHorizontally {
 
     public static void main(String[] args) {
-        // 1. Create a session (Không còn dùng MobileElement generic type)
+        // 1. Create a session
         AppiumDriver appiumDriver = AppiumDriverEx.getAppiumDriver();
 
         try {
-            // 2. Click on Forms label (Dùng AppiumBy.accessibilityId thay vì
-            // findElementByAccessibilityId)
+            // 2. Click on Swipe label
             appiumDriver.findElement(AppiumBy.accessibilityId("Swipe")).click();
 
-            // 3. Make sure on the target screen (WebDriverWait dùng Duration thay vì long)
+            // 3. Make sure on the target screen
             WebDriverWait wait = new WebDriverWait(appiumDriver, Duration.ofSeconds(30));
             wait.until(ExpectedConditions.visibilityOfElementLocated(
                     AppiumBy.xpath("//android.widget.TextView[@text='Swipe horizontal']")));
@@ -36,21 +35,21 @@ public class SwipeVertically {
             int screenWidth = windowSize.getWidth();
 
             // 5. Init start points and end points
-            int xStartPoint = 50 * screenWidth / 100;
-            int xEndPoint = xStartPoint;
-            int yStartPoint = 90 * screenHeight / 100;
-            int yEndPoint = 10 * screenHeight / 100;
+            int xStartPoint = 90 * screenWidth / 100;
+            int xEndPoint = 10 * screenWidth / 100;
+            int yStartPoint = 50 * screenHeight / 100;
+            int yEndPoint = yStartPoint;
 
             Point startPoint = new Point(xStartPoint, yStartPoint);
             Point endPoint = new Point(xEndPoint, yEndPoint);
 
-            // 6. Scroll up - Swipe from bottom to top (yStartPoint -> yEndPoint)
+            // 6. Swipe from right to left (Next card)
             swipe(appiumDriver, startPoint, endPoint, Duration.ofMillis(1000));
 
             // Dừng ngắn giữa 2 lần vuốt để UI ổn định
             Thread.sleep(1000);
 
-            // 7. Scroll down - Swipe from top to bottom (yEndPoint -> yStartPoint)
+            // 7. Swipe from left to right (Previous card)
             swipe(appiumDriver, endPoint, startPoint, Duration.ofMillis(1000));
 
         } catch (Exception e) {

@@ -28,12 +28,15 @@ public class TakingScreenshot {
         WebDriverWait wait = new WebDriverWait(appiumDriver, Duration.ofSeconds(15));
 
         // Navigate to forms screen
-        WebElement formsLabel = wait.until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("Forms")));
+        WebElement formsLabel = wait
+                .until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("Forms")));
         formsLabel.click();
 
         // Click on toggle button IF it's OFF
-        WebElement switchElement = wait.until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("switch")));
-        WebElement switchTextElement = wait.until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("switch-text")));
+        WebElement switchElement = wait
+                .until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("switch")));
+        WebElement switchTextElement = wait
+                .until(ExpectedConditions.visibilityOfElementLocated(AppiumBy.accessibilityId("switch-text")));
         final boolean isSwitchOn = switchTextElement.getText().equals("Click to turn the switch OFF");
 
         if (!isSwitchOn) {
@@ -42,13 +45,12 @@ public class TakingScreenshot {
 
         // Click on dropdown menu -> select the first option
         WebElement dropdownMenuElement = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//*[@content-desc='Dropdown' or @content-desc='select-Dropdown' or contains(@text, 'Select an item')]")
-        ));
+                By.xpath(
+                        "//*[@content-desc='Dropdown' or @content-desc='select-Dropdown' or contains(@text, 'Select an item')]")));
         dropdownMenuElement.click();
 
         WebElement firstOption = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//*[@text='webdriver.io is awesome']")
-        ));
+                By.xpath("//*[@text='webdriver.io is awesome']")));
         firstOption.click();
 
         // Taking a screenshot
@@ -61,9 +63,5 @@ public class TakingScreenshot {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        new TakingScreenshot().testTakingScreenshot();
     }
 }
