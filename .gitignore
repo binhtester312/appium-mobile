@@ -12,9 +12,12 @@ out/
 # --- Maven ---
 target/
 
-# --- Test Output ---
+# --- Test Output & Reports ---
 test-output/
 !test-output/.gitkeep
+.allure/
+allure-results/
+allure-report/
 
 # --- Screenshots & Videos ---
 screenshots/

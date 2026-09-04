@@ -1,8 +1,8 @@
 package testcases.android.apilearning;
 
 import commons.BaseTest;
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
+import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
@@ -10,25 +10,24 @@ import io.qameta.allure.SeverityLevel;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.android.wdio.LoginPage;
-import utils.AppiumDriverEx;
 import utils.DataGenerator;
 import utils.DeviceHelper;
 
 import java.io.File;
 
 /**
- * RecordVideo — Refactored to Page Object Model (POM) with Dynamic Data and Allure Video Attachment.
- * TC: Record screen video while executing Login test flow and attach to Allure.
+ * RecordVideo — Records screen video during test execution and attaches to Allure Report.
  */
 @Epic("API Learning")
 @Feature("Screen Recording")
 public class RecordVideo extends BaseTest {
 
     @Test(
-        description = "Verify screen recording during test execution",
+        description = "TC_RECORD_001: Verify screen recording during test execution",
         groups = {"regression"}
     )
     @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that screen recording captures test execution on device, saves the MP4 file to disk, and attaches it into Allure Report.")
     public void testRecordVideo() {
         AndroidDriver androidDriver = (AndroidDriver) getDriver();
 
@@ -55,28 +54,5 @@ public class RecordVideo extends BaseTest {
 
         Assert.assertNotNull(videoPath, "Video path should not be null.");
         Assert.assertTrue(new File(videoPath).exists(), "Video file should exist on disk.");
-    }
-
-    public static void main(String[] args) {
-        AppiumDriver driver = AppiumDriverEx.getAppiumDriver();
-        AndroidDriver androidDriver = (AndroidDriver) driver;
-        try {
-            DeviceHelper.startRecording(androidDriver);
-            System.out.println(">>> [RECORD] Bắt đầu ghi màn hình...");
-
-            LoginPage loginPage = new LoginPage(androidDriver);
-            String email = DataGenerator.generateEmail("main_video");
-            String password = DataGenerator.generatePassword();
-
-            loginPage.navigateToLoginScreen().login(email, password).clickAlertOkButton();
-
-            String videoPath = DeviceHelper.stopRecordingAndSave(androidDriver, "mainRecordVideo");
-            System.out.println(">>> [RECORD] Video đã lưu tại: " + videoPath);
-            System.out.println(">>> [PASS] Recorded video successfully!");
-        } finally {
-            if (androidDriver != null) {
-                androidDriver.quit();
-            }
-        }
     }
 }

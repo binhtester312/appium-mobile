@@ -1,35 +1,28 @@
 package testcases.android;
 
-import java.net.URI;
-import java.net.URL;
+import commons.BaseTest;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.options.UiAutomator2Options;
+/**
+ * LaunchApp — Sanity check to verify WDIO app launches and driver session is healthy.
+ */
+@Epic("Application")
+@Feature("App Launch & Session")
+public class LaunchApp extends BaseTest {
 
-public class LaunchApp {
-
-    public static void main(String[] args) {
-        // Setup the Appium server URL to connect to
-        try {
-            // driver instance
-            AppiumDriver appiumDriver = null;
-
-            // set capabilities to send to Appium server
-            UiAutomator2Options options = new UiAutomator2Options();
-            options.setPlatformName("Android");
-            options.setAutomationName("UiAutomator2");
-            options.setUdid("emulator-5554");
-            options.setAppPackage("com.wdiodemoapp");
-            options.setAppActivity("com.wdiodemoapp.MainActivity");
-
-            URL appiumServer = URI.create("http://localhost:4723").toURL();
-            appiumDriver = new AndroidDriver(appiumServer, options);
-            appiumDriver = new AppiumDriver(appiumServer, options);
-            // send get text command to Appium server
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Test(
+        description = "TC_SANITY_001: Verify application launches successfully on target device",
+        groups = {"smoke", "regression"}
+    )
+    @Severity(SeverityLevel.BLOCKER)
+    @Description("Verify that Appium successfully initializes a driver session and launches the WDIO demo app.")
+    public void testLaunchApp() {
+        Assert.assertNotNull(getDriver(), "Appium driver session should be active and initialized.");
     }
 }

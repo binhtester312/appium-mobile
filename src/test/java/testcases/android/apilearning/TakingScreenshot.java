@@ -1,7 +1,7 @@
 package testcases.android.apilearning;
 
 import commons.BaseTest;
-import io.appium.java_client.AppiumDriver;
+import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
@@ -13,24 +13,23 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import pageObjects.android.wdio.FormsPage;
 import reports.AllureManager;
-import utils.AppiumDriverEx;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
- * TakingScreenshot — Refactored to Page Object Model (POM) with Allure.
- * TC: Interact with Forms screen and capture a screenshot, saving to disk and Allure.
+ * TakingScreenshot — Captures full screen screenshot and attaches to Allure Report.
  */
 @Epic("API Learning")
 @Feature("Screenshot Capture")
 public class TakingScreenshot extends BaseTest {
 
     @Test(
-        description = "Verify interacting with Forms screen and capturing screenshot",
+        description = "TC_SHOT_001: Verify interacting with Forms screen and capturing screenshot",
         groups = {"regression"}
     )
     @Severity(SeverityLevel.NORMAL)
+    @Description("Verify that Forms screen interactions are executed, a screenshot is saved locally, and embedded into Allure Report.")
     public void testTakingScreenshot() {
         FormsPage formsPage = new FormsPage(getDriver());
         formsPage.navigateToFormsScreen();
@@ -58,31 +57,5 @@ public class TakingScreenshot extends BaseTest {
         AllureManager.saveScreenshot("Forms Screen Screenshot", getDriver());
 
         Assert.assertTrue(destFile.exists(), "Screenshot file should exist on disk.");
-    }
-
-    public static void main(String[] args) {
-        AppiumDriver driver = AppiumDriverEx.getAppiumDriver();
-        try {
-            FormsPage formsPage = new FormsPage(driver);
-            formsPage.navigateToFormsScreen();
-
-            if (!formsPage.isSwitchOn()) {
-                formsPage.clickSwitch();
-            }
-
-            formsPage.selectDropdownOption("webdriver.io is awesome");
-
-            File screenshotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-            String destinationPath = System.getProperty("user.dir") + "/screenshot/formsScreen.png";
-            FileUtils.copyFile(screenshotFile, new File(destinationPath));
-            System.out.println("Screenshot saved successfully to: " + destinationPath);
-            System.out.println(">>> [PASS] Took screenshot successfully!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (driver != null) {
-                driver.quit();
-            }
-        }
     }
 }
