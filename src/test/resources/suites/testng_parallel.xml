@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Parallel Execution Test Suite" verbose="2" parallel="classes" thread-count="2">
+
+    <listeners>
+        <listener class-name="listeners.TestListener"/>
+    </listeners>
+
+    <test name="Parallel Class Execution">
+        <classes>
+            <class name="testcases.android.LoginTest"/>
+            <class name="testcases.android.LaunchApp"/>
+        </classes>
+    </test>
+
+</suite>

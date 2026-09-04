@@ -27,28 +27,23 @@ public class TestListener implements ITestListener {
 
     @Override
     public void onTestStart(ITestResult result) {
-        String testName = result.getName();
-        log.info("▶️  STARTING: {}", testName);
-        ExtentReportManager.logInfo("Test started: " + testName);
+        log.info("▶️  STARTING: {}", result.getName());
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        log.info("✅ PASSED:  {}", result.getName());
-        ExtentReportManager.logPass("Test completed successfully in "
-                + (result.getEndMillis() - result.getStartMillis()) + "ms");
+        log.info("✅ PASSED:  {} ({}ms)", result.getName(),
+                (result.getEndMillis() - result.getStartMillis()));
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
         log.error("❌ FAILED:  {} — {}", result.getName(),
-                result.getThrowable().getMessage());
+                result.getThrowable() != null ? result.getThrowable().getMessage() : "Unknown error");
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
         log.warn("⏭️  SKIPPED: {}", result.getName());
-        ExtentReportManager.logSkip("Skipped: " +
-                (result.getThrowable() != null ? result.getThrowable().getMessage() : "No reason"));
     }
 }

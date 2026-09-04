@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Appium API Learning Test Suite" verbose="2" parallel="none">
+
+    <listeners>
+        <listener class-name="listeners.TestListener"/>
+    </listeners>
+
+    <test name="API Learning and Gesture Tests" preserve-order="true">
+        <classes>
+            <class name="testcases.android.apilearning.clickOnElement"/>
+            <class name="testcases.android.apilearning.emailTxtBx"/>
+            <class name="testcases.android.apilearning.setValues"/>
+            <class name="testcases.android.apilearning.GetValue"/>
+            <class name="testcases.android.apilearning.HandleDropdown"/>
+            <class name="testcases.android.apilearning.HandleToggleButton"/>
+            <class name="testcases.android.apilearning.HandleMultipleMatchedElements"/>
+            <class name="testcases.android.apilearning.SwipeVertically"/>
+            <class name="testcases.android.apilearning.SwipeHorizontally"/>
+            <class name="testcases.android.apilearning.SwipeUntil"/>
+            <class name="testcases.android.apilearning.PutAppInBackground"/>
+            <class name="testcases.android.apilearning.RecordVideo"/>
+            <class name="testcases.android.apilearning.TakingScreenshot"/>
+        </classes>
+    </test>
+
+</suite>

@@ -1,57 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-
 <!--
-    testng.xml — TestNG Suite Configuration
-    
-    Controls:
-    - Which tests to run
-    - Parallel execution settings
-    - Listener registration
-    - Test grouping (smoke / regression)
-    
-    Run via Maven: mvn test
-    Run directly in IntelliJ: Right-click testng.xml → Run
+    Default Root Suite Runner
+    Run specific suites dynamically with:
+    mvn test -DsuiteXmlFile=src/test/resources/suites/testng_smoke.xml
+    mvn test -DsuiteXmlFile=src/test/resources/suites/testng_regression.xml
+    mvn test -DsuiteXmlFile=src/test/resources/suites/testng_apilearning.xml
 -->
-<suite name="Appium Android Test Suite" verbose="2" parallel="none">
+<suite name="Appium Android Master Suite" verbose="2" parallel="none">
 
-    <!-- 
-        Register your listeners here.
-        TestListener handles real-time logging and ExtentReport events.
-    -->
     <listeners>
         <listener class-name="listeners.TestListener"/>
     </listeners>
 
-    <!-- ======================================================
-         SMOKE TESTS — Quick health check (run on every build)
-    ======================================================= -->
-    <test name="Android Smoke Tests" preserve-order="true">
-        <groups>
-            <run>
-                <include name="smoke"/>
-            </run>
-        </groups>
+    <test name="Default Smoke &amp; Sanity Tests" preserve-order="true">
         <classes>
+            <class name="testcases.android.LaunchApp"/>
             <class name="testcases.android.LoginTest"/>
         </classes>
     </test>
-
-    <!-- ======================================================
-         REGRESSION TESTS — Full coverage (run before release)
-         Uncomment to run all tests instead of just smoke
-    ======================================================= -->
-    <!--
-    <test name="Android Regression Tests" preserve-order="true">
-        <groups>
-            <run>
-                <include name="regression"/>
-            </run>
-        </groups>
-        <classes>
-            <class name="testcases.android.LoginTest"/>
-        </classes>
-    </test>
-    -->
 
 </suite>

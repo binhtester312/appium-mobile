@@ -29,6 +29,9 @@
         <jackson.version>2.18.2</jackson.version>
         <commons.io.version>2.17.0</commons.io.version>
         <lombok.version>1.18.36</lombok.version>
+
+        <!-- TestNG Suite Configuration (can be overridden via -DsuiteXmlFile=...) -->
+        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
     </properties>
 
     <dependencies>
@@ -179,9 +182,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.1</version>
                 <configuration>
-                    <!-- Point to your testng.xml suite file -->
+                    <!-- Point to your testng.xml suite file (supports -DsuiteXmlFile=...) -->
                     <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                        <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
                     </suiteXmlFiles>
                     <testFailureIgnore>false</testFailureIgnore>
                     <!-- Pass system properties to tests -->
